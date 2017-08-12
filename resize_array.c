@@ -9,6 +9,16 @@ typedef struct rs_array {
     int size;
 } rs_array;
 
+/*
+ * Does the actual resizing
+ */
+static void resize(rs_array* ra, int new_size)
+{
+    void** buffer = realloc(ra->buff, new_size * sizeof(void*));
+    ra->buff = buffer;
+    ra->capacity = new_size;
+}
+
 void* resize_array(int init_size)
 {
     int sz = init_size == 0 ? DEF_SIZE : init_size;
@@ -20,16 +30,16 @@ void* resize_array(int init_size)
     return rv;
 }
 
+/*
+ * Adds an item to the array. Doubles the size of the array when full.
+ */
 void resize_array_add(void* array, void* item)
 {
     rs_array* ra = array;
 
     if (ra->size == ra->capacity)
     {
-        int sz = ra->capacity * 2;
-        void** buffer = realloc(ra->buff, sz * sizeof(void*));
-        ra->buff = buffer;
-        ra->capacity = sz;
+        resize(ra, ra->capacity * 2);
     }
 
     ra->buff[ra->size] = item;
@@ -42,12 +52,23 @@ void* resize_array_get(void* array, int index)
     return ra->buff[index];
 }
 
+/*
+ * Removes an item from the array and shuffles everything after that
+ * point back one space. Reallcoates the array if it's one quarter full.
+ */
 void resize_array_remove(void* array, int index)
 {
     rs_array* ra = array;
     for (int i = index; i < ra->size - 1; i++)
     {
         ra->buff[i] = ra->buff[i + 1];
+    }
+
+    ra->size--;
+
+    if (ra->size <= ra->capacity / 4)
+    {
+        resize(ra, ra->capacity / 4);
     }
 }
 
@@ -57,6 +78,9 @@ int resize_array_count(void* array)
     return ra->size;
 }
 
+/*
+ * Free the array and its buffer. Optionally free all items within.
+ */
 void resize_array_free(void* array, int items)
 {
     rs_array* ra = array;
