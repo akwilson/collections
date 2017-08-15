@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include "collections.h"
 
 #define DEF_SIZE 8
 
@@ -46,19 +47,36 @@ void resize_array_add(void* array, void* item)
     ra->size++;
 }
 
-void* resize_array_get(void* array, int index)
+enum C_STATUS resize_array_get(void* array, int index, void** item)
 {
     rs_array* ra = array;
-    return ra->buff[index];
+    if (index < 0 || index >= ra->size)
+    {
+        return CE_BOUNDS;
+    }
+
+    *item = ra->buff[index];
+    return C_OK;
 }
 
 /*
  * Removes an item from the array and shuffles everything after that
  * point back one space. Reallcoates the array if it's one quarter full.
  */
-void resize_array_remove(void* array, int index)
+enum C_STATUS resize_array_remove(void* array, int index, void** item)
 {
     rs_array* ra = array;
+    void* rv;
+    int err = resize_array_get(array, index, &rv);
+    if (err)
+    {
+        return err;
+    }
+    else if (item)
+    {
+        *item = rv;
+    }
+
     for (int i = index; i < ra->size - 1; i++)
     {
         ra->buff[i] = ra->buff[i + 1];
@@ -70,6 +88,8 @@ void resize_array_remove(void* array, int index)
     {
         resize(ra, ra->capacity / 4);
     }
+
+    return C_OK;
 }
 
 int resize_array_count(void* array)
