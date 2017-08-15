@@ -26,4 +26,23 @@ int resize_array_count(void* array);
 // free the array and its contents if items is non-zero
 void resize_array_free(void* array, int items);
 
+// create and return a new priority queue, specify initial
+// size and a callback to compare items
+void* priority_queue(int init_size, int (compare*)(void* first, void* second));
+
+// add an item to the priority queue
+void priority_queue_add(void* pqueue, void* item);
+
+// look at but do not remove the head of the queue
+enum C_STATUS priority_queue_peek(void* pqueue, void** item);
+
+// remove the head of the priority queue
+enum C_STATUS priority_queue_pop(void* pqueue, void** item);
+
+// return the number of items in the priority queue
+int priority_queue_count(void* pqueue);
+
+// free the priority queue and its contents if items is non-zero
+void priority_queue_free(void* array, int items);
+
 #endif
