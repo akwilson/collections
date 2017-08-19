@@ -28,13 +28,13 @@ static char* add_rs()
     int num_entries = 3;
     void* array = populate(0, num_entries);
 
-    int s = resize_array_count(array);
+    int s = clxns_count(array);
     MU_ASSERT("Wrong number of items in array", s == num_entries);
 
     char* res;
     for (int i = 0; i < num_entries; i++)
     {
-        enum C_STATUS err = resize_array_get(array, i, (void**)&res);
+        C_STATUS err = resize_array_get(array, i, (void**)&res);
         MU_ASSERT("Non-zero error code on get", err == C_OK);
         char* buf = (char*)malloc(8);
         sprintf(buf, "string%d", i);
@@ -53,19 +53,21 @@ static char* add_rs_adjust()
     int num_entries = 30;
     void* array = populate(4, num_entries);
 
-    int s = resize_array_count(array);
+    int s = clxns_count(array);
     MU_ASSERT("Wrong number of items in array", s == num_entries);
 
-    char* res;
-    for (int i = 0; i < num_entries; i++)
+    int i = 0;
+    void* iter = clxns_iter_new(array);
+    while (clxns_iter_move_next(iter))
     {
-        enum C_STATUS err = resize_array_get(array, i, (void**)&res);
-        MU_ASSERT("Non-zero error code on get", err == C_OK);
+        char* res = clxns_iter_get_next(iter);
         char* buf = (char*)malloc(9);
-        sprintf(buf, "string%d", i);
-        MU_ASSERT("Incorrect data", strcmp(res, buf) == 0);
+        sprintf(buf, "string%d", i++);
+        MU_ASSERT("Incorrect data in iter", strcmp(res, buf) == 0);
     }
 
+    MU_ASSERT("Incorrect iter count", i == 30);
+    clxns_iter_free(iter);
     resize_array_free(array, 1);
     return 0;
 }
@@ -75,10 +77,10 @@ static char* remove_rs()
     int num_entries = 5;
     void* array = populate(0, num_entries);
 
-    int s = resize_array_count(array);
+    int s = clxns_count(array);
     MU_ASSERT("Wrong number of items in array", s == num_entries);
 
-    enum C_STATUS err = resize_array_remove(array, 2, 0);
+    C_STATUS err = resize_array_remove(array, 2, 0);
     MU_ASSERT("Non-zero error code on remove", err == C_OK);
     err = resize_array_remove(array, 3, 0);
     MU_ASSERT("Non-zero error code on remove", err == C_OK);
@@ -87,7 +89,7 @@ static char* remove_rs()
     MU_ASSERT("Non-zero error code on remove", err == C_OK);
     MU_ASSERT("Remove should return value if asked", strcmp(res, "string0") == 0);
 
-    s = resize_array_count(array);
+    s = clxns_count(array);
     MU_ASSERT("Wrong number of items in array after removals", s == 2);
 
     err = resize_array_get(array, 0, (void**)&res);
@@ -103,14 +105,14 @@ static char* remove_rs_adjust()
     int num_entries = 30;
     void* array = populate(4, num_entries);
 
-    enum C_STATUS err;
+    C_STATUS err;
     for (int i = 0; i < num_entries - 1; i++)
     {
         err = resize_array_remove(array, 0, 0);
         MU_ASSERT("Non-zero error code on remove", err == C_OK);
     }
 
-    int s = resize_array_count(array);
+    int s = clxns_count(array);
     MU_ASSERT("Wrong number of items in array after removals", s == 1);
     char* res;
     err = resize_array_get(array, 0, (void**)&res);
@@ -123,7 +125,7 @@ static char* check_errors()
     void* array = resize_array(0);
     // get empty array
     char* res;
-    enum C_STATUS err = resize_array_get(array, 0, (void**)&res);
+    C_STATUS err = resize_array_get(array, 0, (void**)&res);
     MU_ASSERT("Empty array should return error on get", err == CE_BOUNDS);
 
     err = resize_array_remove(array, 0, 0);

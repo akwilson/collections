@@ -1,5 +1,5 @@
 BIN = ctest
-SRCS = ctest.c resize_array.c
+SRCS = ctest.c resize_array.c common.c
 
 BUILDDIR = build
 
