@@ -4,8 +4,9 @@
 // return codes
 typedef enum
 {
-    C_OK      = 0,
-    CE_BOUNDS = 1   // requested item was out of bounds of the array
+    C_OK         = 0,
+    CE_BOUNDS    = 1,   // requested item was out of bounds of the array
+    CE_NULL_ITEM = 2    // add null item to collection
 } C_STATUS;
 
 // == COMMON ==================================================================
@@ -46,16 +47,14 @@ void resize_array_free(void* array, int items);
 void* priority_queue(int init_size, int (*compare)(void* first, void* second));
 
 // add an item to the priority queue
-void priority_queue_add(void* pqueue, void* item);
+// may return CE_NULL_ITEM
+C_STATUS priority_queue_add(void* pqueue, void* item);
 
 // look at but do not remove the head of the queue
-C_STATUS priority_queue_peek(void* pqueue, void** item);
+void* priority_queue_peek(void* pqueue);
 
 // remove the head of the priority queue
-C_STATUS priority_queue_pop(void* pqueue, void** item);
-
-// return the number of items in the priority queue
-int priority_queue_count(void* pqueue);
+void* priority_queue_pop(void* pqueue);
 
 // free the priority queue and its contents if items is non-zero
 void priority_queue_free(void* array, int items);
