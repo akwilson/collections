@@ -1,5 +1,8 @@
 BIN = ctest
-SRCS = ctest.c common.c resize_array.c priority_queue.c
+SRCS = ctest.c common.c resize_array.c
+
+BIN1 = pq_test
+SRCS1 = common.c resize_array.c priority_queue.c pq_test.c
 
 BUILDDIR = build
 

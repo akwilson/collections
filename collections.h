@@ -35,6 +35,9 @@ void resize_array_add(void* array, void* item);
 // access an item at the given position in the array
 C_STATUS resize_array_get(void* array, int index, void** item);
 
+// swap two items in the array
+C_STATUS resize_array_exchange(void* array, int first, int second);
+
 // remove an item from the array, set item to the value if non-zero is passed in
 C_STATUS resize_array_remove(void* array, int index, void** item);
 
@@ -51,10 +54,10 @@ void* priority_queue(int init_size, int (*compare)(void* first, void* second));
 C_STATUS priority_queue_add(void* pqueue, void* item);
 
 // look at but do not remove the head of the queue
-void* priority_queue_peek(void* pqueue);
+C_STATUS priority_queue_peek(void* pqueue, void** item);
 
 // remove the head of the priority queue
-void* priority_queue_pop(void* pqueue);
+C_STATUS priority_queue_pop(void* pqueue, void** item);
 
 // free the priority queue and its contents if items is non-zero
 void priority_queue_free(void* array, int items);

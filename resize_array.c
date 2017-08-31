@@ -82,6 +82,21 @@ C_STATUS resize_array_get(void* array, int index, void** item)
     return C_OK;
 }
 
+C_STATUS resize_array_exchange(void* array, int first, int second)
+{
+    rs_array* ra = array;
+    if (first < 0 || first >= ra->head.size ||
+        second < 0 || second >= ra->head.size)
+    {
+        return CE_BOUNDS;
+    }
+
+    void* tmp = ra->buff[first];
+    ra->buff[first] = ra->buff[second];
+    ra->buff[second] = tmp;
+    return C_OK;
+}
+
 /*
  * Removes an item from the array and shuffles everything after that
  * point back one space. Reallcoates the array if it's one quarter full.

@@ -141,6 +141,36 @@ static char* check_errors()
     return 0;
 }
 
+static char* exchange()
+{
+    int num_entries = 5;
+    void* array = populate(0, num_entries);
+
+    C_STATUS status = resize_array_exchange(array, -1, 3);
+    MU_ASSERT("Wrong status after exchange", status == CE_BOUNDS);
+
+    status = resize_array_exchange(array, 3, -1);
+    MU_ASSERT("Wrong status after exchange", status == CE_BOUNDS);
+
+    status = resize_array_exchange(array, 5, 3);
+    MU_ASSERT("Wrong status after exchange", status == CE_BOUNDS);
+
+    status = resize_array_exchange(array, 3, 5);
+    MU_ASSERT("Wrong status after exchange", status == CE_BOUNDS);
+
+    status = resize_array_exchange(array, 0, 4);
+    MU_ASSERT("Wrong status after exchange", status == C_OK);
+
+    char* res;
+    resize_array_get(array, 0, (void**)&res);
+    MU_ASSERT("Wrong value at pos 0 after exchange", strcmp("string4", res) == 0);
+
+    resize_array_get(array, 4, (void**)&res);
+    MU_ASSERT("Wrong value at pos 0 after exchange", strcmp("string0", res) == 0);
+
+    return 0;
+}
+
 static char* all_tests()
 {
     MU_RUN_TEST(add_rs);
@@ -148,6 +178,7 @@ static char* all_tests()
     MU_RUN_TEST(remove_rs);
     MU_RUN_TEST(remove_rs_adjust);
     MU_RUN_TEST(check_errors);
+    MU_RUN_TEST(exchange);
     return 0;
 }
 

@@ -17,16 +17,31 @@ static int get_next_iter(void* array, void* iter_state, void** next)
 {
 }
 
-static void sink(void* array, int key)
+static int greaterThan(p_queue* pq, int first, int second)
+{
+    void* fVal;
+    void* sVal;
+    resize_array_get(pq->array, first, &fVal);
+    resize_array_get(pq->array, second, &sVal);
+    if (pq->compare(fVal, sVal) > 0)
+    {
+        return 1;
+    }
+
+    return 0;
+}
+
+static void sink(void* pqueue, int key)
 {
 }
 
-static void swim(void* array, int key)
+static void swim(p_queue* pq, int key)
 {
-}
-
-static void exchange(void* array, int key_a, int key_b)
-{
+    while (key > 1 && greaterThan(pq, key / 2, key))
+    {
+        resize_array_exchange(pq->array, key, key / 2);
+        key /= 2;
+    }
 }
 
 void* priority_queue(int init_size, int (*compare)(void* first, void* second))
@@ -37,9 +52,17 @@ void* priority_queue(int init_size, int (*compare)(void* first, void* second))
     rv->head.size = 0;
     rv->head.alloc_iter_state = alloc_iter_state;
     rv->head.get_next_iter = get_next_iter;
+
+    // 1 based array for the heap
+    resize_array_add(rv->array, NULL);
     return rv;
 }
 
+/*
+ * Add value to the end of the array, i.e. the end of the heap and
+ * swim it up the heap until it finds the root or a parent with a
+ * higher value
+ */
 C_STATUS priority_queue_add(void* pqueue, void* item)
 {
     if (item == NULL)
@@ -49,15 +72,18 @@ C_STATUS priority_queue_add(void* pqueue, void* item)
 
     p_queue* pq = pqueue;
     resize_array_add(pq->array, item);
-    swim(pq->array, ++pq->head.size);
+    swim(pq, ++(pq->head.size));
+    return C_OK;
 }
 
-void* priority_queue_pop(void* pqueue)
+C_STATUS priority_queue_pop(void* pqueue, void** item)
 {
 }
 
-void* priority_queue_peek(void* pqueue)
+C_STATUS priority_queue_peek(void* pqueue, void** item)
 {
+    p_queue* pq = pqueue;
+    return resize_array_get(pq->array, 1, item);
 }
 
 void priority_queue_free(void* array, int items)
