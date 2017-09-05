@@ -157,7 +157,7 @@ static char* all_tests()
     MU_RUN_TEST(add_items);
     MU_RUN_TEST(peek_items);
     MU_RUN_TEST(pop_items);
-    // MU_RUN_TEST(iterate_items);
+    MU_RUN_TEST(iterate_items);
     return 0;
 }
 

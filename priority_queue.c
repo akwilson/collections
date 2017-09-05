@@ -9,11 +9,11 @@ typedef struct p_queue
     int (*compare)(void* first, void* second);
 } p_queue;
 
-static void* alloc_iter_state()
+static void* alloc_iter_state(p_queue* pq)
 {
 }
 
-static int get_next_iter(void* array, void* iter_state, void** next)
+static int get_next_iter(p_queue* pq, void* iter_state, void** next)
 {
 }
 

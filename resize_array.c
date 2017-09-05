@@ -25,7 +25,7 @@ static void resize(rs_array* ra, int new_size)
 /*
  * Allocates an integer to keep track of the position in the array
  */
-static void* alloc_iter_state()
+static void* alloc_iter_state(void* array)
 {
     int* st = (int*)malloc(sizeof(int));
     *st = 0;

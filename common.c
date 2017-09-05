@@ -19,7 +19,7 @@ void* clxns_iter_new(void* collection)
 {
     iterator_t* iter = (iterator_t*)malloc(sizeof(iterator_t));
     iter->collection = collection;
-    iter->state = ((header*)collection)->alloc_iter_state();
+    iter->state = ((header*)collection)->alloc_iter_state(collection);
     iter->next_item = 0;
     return iter;
 }
