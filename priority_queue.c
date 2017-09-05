@@ -31,8 +31,24 @@ static int greaterThan(p_queue* pq, int first, int second)
     return 0;
 }
 
-static void sink(void* pqueue, int key)
+static void sink(p_queue* pq, int key)
 {
+    while (2 * key < pq->head.size)
+    {
+        int j = 2 * key;
+        if (j < pq->head.size && greaterThan(pq, j, j + 1))
+        {
+            j++;
+        }
+
+        if (!greaterThan(pq, key, j))
+        {
+            break;
+        }
+
+        resize_array_exchange(pq->array, key, j);
+        key = j;
+    }
 }
 
 static void swim(p_queue* pq, int key)
@@ -78,6 +94,18 @@ C_STATUS priority_queue_add(void* pqueue, void* item)
 
 C_STATUS priority_queue_pop(void* pqueue, void** item)
 {
+    p_queue* pq = pqueue;
+    int last = pq->head.size;
+    C_STATUS status = resize_array_exchange(pq->array, 1, last);
+    if (status == CE_BOUNDS)
+    {
+        return status;
+    }
+
+    resize_array_remove(pq->array, last, item);
+    pq->head.size = last - 1;
+    sink(pq, 1);
+    return C_OK;
 }
 
 C_STATUS priority_queue_peek(void* pqueue, void** item)
@@ -86,6 +114,9 @@ C_STATUS priority_queue_peek(void* pqueue, void** item)
     return resize_array_get(pq->array, 1, item);
 }
 
-void priority_queue_free(void* array, int items)
+void priority_queue_free(void* pqueue, int items)
 {
+    p_queue* pq = pqueue;
+    resize_array_free(pq->array, items);
+    free(pq);
 }
