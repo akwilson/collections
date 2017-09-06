@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "common.h"
 #include "collections.h"
 
@@ -9,12 +10,11 @@ typedef struct p_queue
     int (*compare)(void* first, void* second);
 } p_queue;
 
-static void* alloc_iter_state(p_queue* pq)
+static int get_next_iter(void* collection, void* iter_state, void** next)
 {
-}
-
-static int get_next_iter(p_queue* pq, void* iter_state, void** next)
-{
+    p_queue* pq = iter_state;
+    C_STATUS status = priority_queue_pop(pq, next);
+    return status == C_OK;
 }
 
 static int greaterThan(p_queue* pq, int first, int second)
@@ -66,7 +66,7 @@ void* priority_queue(int init_size, int (*compare)(void* first, void* second))
     rv->array = resize_array(init_size);
     rv->compare = compare;
     rv->head.size = 0;
-    rv->head.alloc_iter_state = alloc_iter_state;
+    rv->head.alloc_iter_state = priority_queue_copy;
     rv->head.get_next_iter = get_next_iter;
 
     // 1 based array for the heap
@@ -112,6 +112,15 @@ C_STATUS priority_queue_peek(void* pqueue, void** item)
 {
     p_queue* pq = pqueue;
     return resize_array_get(pq->array, 1, item);
+}
+
+void* priority_queue_copy(void* pqueue)
+{
+    p_queue* pq = pqueue;
+    p_queue* rv = (p_queue*)malloc(sizeof(p_queue));
+    memcpy(rv, pq, sizeof(p_queue));
+    rv->array = resize_array_copy(pq->array);
+    return rv;
 }
 
 void priority_queue_free(void* pqueue, int items)

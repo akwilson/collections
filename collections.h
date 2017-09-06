@@ -41,6 +41,9 @@ C_STATUS resize_array_exchange(void* array, int first, int second);
 // remove an item from the array, set item to the value if non-zero is passed in
 C_STATUS resize_array_remove(void* array, int index, void** item);
 
+// shallow copy a resize array
+void* resize_array_copy(void* array);
+
 // free the array and its contents if items is non-zero
 void resize_array_free(void* array, int items);
 
@@ -58,6 +61,9 @@ C_STATUS priority_queue_peek(void* pqueue, void** item);
 
 // remove the head of the priority queue
 C_STATUS priority_queue_pop(void* pqueue, void** item);
+
+// shallow copy a priority queue
+void* priority_queue_copy(void* pqueue);
 
 // free the priority queue and its contents if items is non-zero
 void priority_queue_free(void* array, int items);

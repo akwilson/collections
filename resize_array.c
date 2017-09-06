@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "common.h"
 #include "collections.h"
 
@@ -128,6 +129,17 @@ C_STATUS resize_array_remove(void* array, int index, void** item)
     }
 
     return C_OK;
+}
+
+void* resize_array_copy(void* array)
+{
+    rs_array* ra = array;
+    rs_array* rv = (rs_array*)malloc(sizeof(rs_array));
+    memcpy(rv, ra, sizeof(rs_array));
+
+    rv->buff = malloc(rv->head.size * sizeof(void*));
+    memcpy(rv->buff, ra->buff, rv->head.size * sizeof(void*));
+    return rv;
 }
 
 /*

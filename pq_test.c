@@ -152,11 +152,44 @@ static char* iterate_items()
     return 0;
 }
 
+static char* copy_queue()
+{
+    void* pq = priority_queue(0, compare);
+    priority_queue_add(pq, "CCC");
+    priority_queue_add(pq, "BBB");
+    priority_queue_add(pq, "DDD");
+    priority_queue_add(pq, "GGG");
+    priority_queue_add(pq, "AAA");
+
+    void* pq2 = priority_queue_copy(pq);
+
+    int cnt = clxns_count(pq2);
+    MU_ASSERT("Wrong item return count on new q", cnt == 5);
+
+    priority_queue_add(pq2, "AA");
+    cnt = clxns_count(pq);
+    MU_ASSERT("Wrong item return count on orig q after add", cnt == 5);
+    cnt = clxns_count(pq2);
+    MU_ASSERT("Wrong item return count on new q after add", cnt == 6);
+
+    char* res;
+    C_STATUS status = priority_queue_peek(pq, (void*)&res);
+    MU_ASSERT("Wrong status at peek head on orig", status == C_OK);
+    MU_ASSERT("Wrong item at peek head on orig", strcmp(res, "AAA") == 0);
+
+    status = priority_queue_peek(pq2, (void*)&res);
+    MU_ASSERT("Wrong status at peek head on new", status == C_OK);
+    MU_ASSERT("Wrong item at peek head on new", strcmp(res, "AA") == 0);
+
+    return 0;
+}
+
 static char* all_tests()
 {
     MU_RUN_TEST(add_items);
     MU_RUN_TEST(peek_items);
     MU_RUN_TEST(pop_items);
+    MU_RUN_TEST(copy_queue);
     MU_RUN_TEST(iterate_items);
     return 0;
 }

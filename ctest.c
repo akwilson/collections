@@ -171,6 +171,31 @@ static char* exchange()
     return 0;
 }
 
+static char* copy_array()
+{
+    int num_entries = 5;
+    void* array = populate(0, num_entries);
+    void* array2 = resize_array_copy(array);
+
+    int s = clxns_count(array2);
+    MU_ASSERT("Wrong number of items in array", s == num_entries);
+
+    resize_array_add(array2, "akw");
+
+    s = clxns_count(array);
+    MU_ASSERT("Wrong number of items in orig array after add", s == num_entries);
+    s = clxns_count(array2);
+    MU_ASSERT("Wrong number of items in new array after add", s == num_entries + 1);
+
+    char* res;
+    C_STATUS status = resize_array_get(array, 5, (void**)&res);
+    MU_ASSERT("Item should not be added to original array", status == CE_BOUNDS);
+
+    status = resize_array_get(array2, 5, (void**)&res);
+    MU_ASSERT("Item should be added to new array status", status == C_OK);
+    MU_ASSERT("Item should be added to new array", strcmp("akw", res) == 0);
+}
+
 static char* all_tests()
 {
     MU_RUN_TEST(add_rs);
@@ -179,6 +204,7 @@ static char* all_tests()
     MU_RUN_TEST(remove_rs_adjust);
     MU_RUN_TEST(check_errors);
     MU_RUN_TEST(exchange);
+    MU_RUN_TEST(copy_array);
     return 0;
 }
 
@@ -191,7 +217,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-        printf("All tests passed\n");
+        printf("All resize array tests passed\n");
     }
 
     printf("%d tests run\n", tests_run);
