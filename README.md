@@ -7,6 +7,11 @@ A slowly expanding collection of collection implementations in C. So far we have
 * Doubles in size whenever it is full
 * Halves in size whenever a quarter full
 
+## Priority Queue
+* Add items to the queue and initialise with a compare function
+* Compare function defines priority
+* Items will be returned in priority order
+
 ## Common Functions
 * Return the number of items in the collection
 * Iterate over the collection
