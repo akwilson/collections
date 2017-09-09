@@ -1,43 +1,17 @@
-BIN = ctest
-SRCS = ctest.c common.c resize_array.c
+SUBDIRS = src test
 
-BIN1 = pq_test
-SRCS1 = common.c resize_array.c priority_queue.c pq_test.c
+SUBCLEAN = $(addsuffix .cln, $(SUBDIRS))
 
-BUILDDIR = build
+.PHONY: clean subdirs $(SUBDIRS) $(SUBCLEAN)
 
-BIN_OUT = $(addprefix $(BUILDDIR)/, $(BIN))
-BIN1_OUT = $(addprefix $(BUILDDIR)/, $(BIN1))
-BIN2_OUT = $(addprefix $(BUILDDIR)/, $(BIN2))
-OBJS = $(SRCS:.c=.o)
-DEPS = $(SRCS:.c=.d)
-OBJS1 = $(SRCS1:.c=.o)
-DEPS1 = $(SRCS1:.c=.d)
-OBJS2 = $(SRCS2:.c=.o)
-DEPS2 = $(SRCS2:.c=.d)
-CFLAGS = -g -I. -I /usr/local/include
-#LDFLAGS = -linker_flags
+subdirs: $(SUBDIRS)
 
-$(BUILDDIR)/%.o : %.c
-	@echo $(COMPILE.c) -MMD -o $@ $<
-	@$(COMPILE.c) -MMD -o $@ $<
-	@sed -i 's,\($(BUILDDIR)/$*\.o\)[ :]*\(.*\),$@ : $$\(wildcard \2\)\n\1 : \2,g' $(BUILDDIR)/$*.d
+$(SUBDIRS):
+	$(MAKE) -C $@
 
-all : $(BIN_OUT) $(BIN1_OUT) $(BIN2_OUT)
+test: src
 
-$(BIN_OUT) : $(addprefix $(BUILDDIR)/, $(OBJS))
-	$(LINK.c) $^ $(LIBS) -o $@
+clean: $(SUBCLEAN)
 
-$(BIN1_OUT) : $(addprefix $(BUILDDIR)/, $(OBJS1))
-	$(LINK.c) $^ $(LIBS) -o $@
-
-$(BIN2_OUT) : $(addprefix $(BUILDDIR)/, $(OBJS2))
-	$(LINK.c) $^ $(LIBS) -o $@
-
-.PHONY: clean
-clean :
-	rm $(addprefix $(BUILDDIR)/, *.o) \
-		$(addprefix $(BUILDDIR)/, *.d) \
-		$(BIN_OUT) \
-		$(BIN1_OUT) \
-		$(BIN2_OUT)
+$(SUBCLEAN):
+	$(MAKE) clean -C $(basename $@)

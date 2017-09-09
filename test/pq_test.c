@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "collections.h"
+#include "../src/collections.h"
 #include "minunit.h"
 
 int tests_run = 0;
