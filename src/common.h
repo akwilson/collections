@@ -1,3 +1,6 @@
+#ifndef COMMON_H
+#define COMMON_H
+
 // header object common to all collections
 typedef struct header
 {
@@ -8,3 +11,5 @@ typedef struct header
     // gets the next iterator item in the collection
     int (*get_next_iter)(void* collection, void* state, void** data);
 } header;
+
+#endif

@@ -11,6 +11,7 @@ typedef struct rs_array
     header head;
     void** buff;  // the data in the array
     int capacity; // the number of items allocated to the array
+    int base_cap; // the intial / minimum size
 } rs_array;
 
 /*
@@ -49,6 +50,7 @@ void* resize_array(int init_size)
     void** buffer = malloc(sz * sizeof(void*));
     rv->buff = buffer;
     rv->capacity = sz;
+    rv->base_cap = sz;
     rv->head.size = 0;
     rv->head.alloc_iter_state = alloc_iter_state;
     rv->head.get_next_iter = get_next_iter;
@@ -123,7 +125,7 @@ C_STATUS resize_array_remove(void* array, int index, void** item)
 
     ra->head.size--;
 
-    if (ra->head.size <= ra->capacity / 4)
+    if (ra->head.size > ra->base_cap && ra->head.size <= ra->capacity / 4)
     {
         resize(ra, ra->capacity / 4);
     }
@@ -137,7 +139,8 @@ void* resize_array_copy(void* array)
     rs_array* rv = (rs_array*)malloc(sizeof(rs_array));
     memcpy(rv, ra, sizeof(rs_array));
 
-    rv->buff = malloc(rv->head.size * sizeof(void*));
+    void** buffer = malloc(rv->capacity * sizeof(void*));
+    rv->buff = buffer;
     memcpy(rv->buff, ra->buff, rv->head.size * sizeof(void*));
     return rv;
 }

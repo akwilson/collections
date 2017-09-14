@@ -4,14 +4,12 @@
 #include "../src/collections.h"
 #include "minunit.h"
 
-int tests_run = 0;
-
 static int compare(void* first, void* second)
 {
     return strcmp((const char*)first, (const char*)second);
 }
 
-static char* add_items()
+char* pq_add_items()
 {
     void* pq = priority_queue(0, compare);
     C_STATUS status = priority_queue_add(pq, "CCC");
@@ -41,7 +39,7 @@ static char* add_items()
     return 0;
 }
 
-static char* peek_items()
+char* pq_peek_items()
 {
     void* pq = priority_queue(0, compare);
     priority_queue_add(pq, "CCC");
@@ -65,7 +63,7 @@ static char* peek_items()
     return 0;
 }
 
-static char* pop_items()
+char* pq_pop_items()
 {
     void* pq = priority_queue(0, compare);
     priority_queue_add(pq, "CCC");
@@ -111,7 +109,7 @@ static char* pop_items()
     return 0;
 }
 
-static char* iterate_items()
+char* pq_iterate_items()
 {
     void* pq = priority_queue(0, compare);
     priority_queue_add(pq, "CCC");
@@ -152,7 +150,7 @@ static char* iterate_items()
     return 0;
 }
 
-static char* copy_queue()
+char* pq_copy_queue()
 {
     void* pq = priority_queue(0, compare);
     priority_queue_add(pq, "CCC");
@@ -182,30 +180,4 @@ static char* copy_queue()
     MU_ASSERT("Wrong item at peek head on new", strcmp(res, "AA") == 0);
 
     return 0;
-}
-
-static char* all_tests()
-{
-    MU_RUN_TEST(add_items);
-    MU_RUN_TEST(peek_items);
-    MU_RUN_TEST(pop_items);
-    MU_RUN_TEST(copy_queue);
-    MU_RUN_TEST(iterate_items);
-    return 0;
-}
-
-int main(int argc, char* argv[])
-{
-    char* result = all_tests();
-    if (result != 0)
-    {
-        printf("%s\n", result);
-    }
-    else
-    {
-        printf("All priority queue tests passed\n");
-    }
-
-    printf("%d priority queue tests run\n", tests_run);
-    return result != 0;
 }
