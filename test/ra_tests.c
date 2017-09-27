@@ -97,6 +97,7 @@ char* ra_remove()
     MU_ASSERT("Non-zero error code on get", err == C_OK);
     MU_ASSERT("Wrong item at 1", strcmp(res, "string3") == 0);
 
+    resize_array_free(array, 1);
     return 0;
 }
 
@@ -119,6 +120,7 @@ char* ra_remove_adjust()
     MU_ASSERT("Non-zero error code on get", err == C_OK);
     MU_ASSERT("Wrong item at 1", strcmp(res, "string29") == 0);
 
+    resize_array_free(array, 1);
     return 0;
 }
 
@@ -140,6 +142,7 @@ char* ra_check_errors()
     err = resize_array_remove(array, 99, 0);
     MU_ASSERT("Array should return OOB on remove", err == CE_BOUNDS);
 
+    resize_array_free(array, 0);
     return 0;
 }
 
@@ -170,6 +173,7 @@ char* ra_exchange()
     resize_array_get(array, 4, (void**)&res);
     MU_ASSERT("Wrong value at pos 0 after exchange", strcmp("string0", res) == 0);
 
+    resize_array_free(array, 0);
     return 0;
 }
 
@@ -197,5 +201,7 @@ char* ra_copy_array()
     MU_ASSERT("Item should be added to new array status", status == C_OK);
     MU_ASSERT("Item should be added to new array", strcmp("akw", res) == 0);
 
+    resize_array_free(array2, 0);
+    resize_array_free(array, 0);
     return 0;
 }

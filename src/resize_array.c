@@ -54,6 +54,7 @@ void* resize_array(int init_size)
     rv->head.size = 0;
     rv->head.alloc_iter_state = alloc_iter_state;
     rv->head.get_next_iter = get_next_iter;
+    rv->head.free_iter = 0;
     return rv;
 }
 

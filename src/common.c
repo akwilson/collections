@@ -42,6 +42,14 @@ void* clxns_iter_get_next(void* iterator)
 void clxns_iter_free(void* iterator)
 {
     iterator_t* iter = iterator;
-    free(iter->state);
+    if (((header*)iter->collection)->free_iter != 0)
+    {
+        ((header*)iter->collection)->free_iter(iter->state);
+    }
+    else
+    {
+        free(iter->state);
+    }
+
     free(iter);
 }

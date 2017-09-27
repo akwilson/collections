@@ -17,6 +17,11 @@ static int get_next_iter(void* collection, void* iter_state, void** next)
     return status == C_OK;
 }
 
+static void free_iter(void* iter_state)
+{
+    priority_queue_free(iter_state, 0);
+}
+
 static int greaterThan(p_queue* pq, int first, int second)
 {
     void* fVal;
@@ -68,6 +73,7 @@ void* priority_queue(int init_size, int (*compare)(void* first, void* second))
     rv->head.size = 0;
     rv->head.alloc_iter_state = priority_queue_copy;
     rv->head.get_next_iter = get_next_iter;
+    rv->head.free_iter = free_iter;
 
     // 1 based array for the heap
     resize_array_add(rv->array, NULL);

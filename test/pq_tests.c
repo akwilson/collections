@@ -36,6 +36,7 @@ char* pq_add_items()
     int cnt = clxns_count(pq);
     MU_ASSERT("Wrong item return count", cnt == 7);
 
+    priority_queue_free(pq, 0);
     return 0;
 }
 
@@ -60,6 +61,7 @@ char* pq_peek_items()
     status = priority_queue_peek(pq, (void*)&res);
     MU_ASSERT("Wrong status at peek on empty queue", status == CE_BOUNDS);
 
+    priority_queue_free(pq, 0);
     return 0;
 }
 
@@ -106,6 +108,7 @@ char* pq_pop_items()
     status = priority_queue_pop(pq, (void*)&res);
     MU_ASSERT("Wrong status at pop on empty queue", status == CE_BOUNDS);
 
+    priority_queue_free(pq, 0);
     return 0;
 }
 
@@ -147,6 +150,8 @@ char* pq_iterate_items()
     avail = clxns_iter_move_next(iter);
     MU_ASSERT("Wrong iter move next rv", avail == 0);
 
+    clxns_iter_free(iter);
+    priority_queue_free(pq, 0);
     return 0;
 }
 
@@ -179,5 +184,7 @@ char* pq_copy_queue()
     MU_ASSERT("Wrong status at peek head on new", status == C_OK);
     MU_ASSERT("Wrong item at peek head on new", strcmp(res, "AA") == 0);
 
+    priority_queue_free(pq2, 0);
+    priority_queue_free(pq, 0);
     return 0;
 }
