@@ -19,6 +19,7 @@ static char* all_tests()
     MU_RUN_TEST(pq_add_items);
     MU_RUN_TEST(pq_peek_items);
     MU_RUN_TEST(pq_pop_items);
+    MU_RUN_TEST(pq_pop_items_max);
     MU_RUN_TEST(pq_iterate_items);
     MU_RUN_TEST(pq_copy_queue);
 

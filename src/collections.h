@@ -50,7 +50,9 @@ void resize_array_free(void* array, int items);
 // == PRIORITY QUEUE ===========================================================
 // create and return a new priority queue, specify initial
 // size and a callback to compare items
-void* priority_queue(int init_size, int (*compare)(void* first, void* second));
+// _min orders ascending, _max orders descending
+void* priority_queue_min(int init_size, int (*compare)(void* first, void* second));
+void* priority_queue_max(int init_size, int (*compare)(void* first, void* second));
 
 // add an item to the priority queue
 // may return CE_NULL_ITEM

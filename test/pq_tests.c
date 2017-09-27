@@ -11,7 +11,7 @@ static int compare(void* first, void* second)
 
 char* pq_add_items()
 {
-    void* pq = priority_queue(0, compare);
+    void* pq = priority_queue_min(0, compare);
     C_STATUS status = priority_queue_add(pq, "CCC");
     MU_ASSERT("Bad return status after item add", status == C_OK);
 
@@ -42,7 +42,7 @@ char* pq_add_items()
 
 char* pq_peek_items()
 {
-    void* pq = priority_queue(0, compare);
+    void* pq = priority_queue_min(0, compare);
     priority_queue_add(pq, "CCC");
     priority_queue_add(pq, "BBB");
     priority_queue_add(pq, "DDD");
@@ -57,7 +57,7 @@ char* pq_peek_items()
     int cnt = clxns_count(pq);
     MU_ASSERT("Wrong item return count", cnt == 5);
 
-    pq = priority_queue(0, compare);
+    pq = priority_queue_min(0, compare);
     status = priority_queue_peek(pq, (void*)&res);
     MU_ASSERT("Wrong status at peek on empty queue", status == CE_BOUNDS);
 
@@ -67,7 +67,7 @@ char* pq_peek_items()
 
 char* pq_pop_items()
 {
-    void* pq = priority_queue(0, compare);
+    void* pq = priority_queue_min(0, compare);
     priority_queue_add(pq, "CCC");
     priority_queue_add(pq, "BBB");
     priority_queue_add(pq, "DDD");
@@ -112,9 +112,56 @@ char* pq_pop_items()
     return 0;
 }
 
+char* pq_pop_items_max()
+{
+    void* pq = priority_queue_max(0, compare);
+    priority_queue_add(pq, "CCC");
+    priority_queue_add(pq, "BBB");
+    priority_queue_add(pq, "DDD");
+    priority_queue_add(pq, "GGG");
+    priority_queue_add(pq, "AAA");
+
+    char* res;
+    C_STATUS status = priority_queue_pop(pq, (void*)&res);
+    MU_ASSERT("Wrong status at pop head max", status == C_OK);
+    MU_ASSERT("Wrong item at pop head max", strcmp(res, "GGG") == 0);
+    int cnt = clxns_count(pq);
+    MU_ASSERT("Wrong item return count max", cnt == 4);
+
+    status = priority_queue_pop(pq, (void*)&res);
+    MU_ASSERT("Wrong status at pop head max", status == C_OK);
+    MU_ASSERT("Wrong item at pop head max", strcmp(res, "DDD") == 0);
+    cnt = clxns_count(pq);
+    MU_ASSERT("Wrong item return count", cnt == 3);
+
+    status = priority_queue_pop(pq, (void*)&res);
+    MU_ASSERT("Wrong status at pop head max", status == C_OK);
+    MU_ASSERT("Wrong item at pop head max", strcmp(res, "CCC") == 0);
+    cnt = clxns_count(pq);
+    MU_ASSERT("Wrong item return count max", cnt == 2);
+
+    status = priority_queue_pop(pq, (void*)&res);
+    MU_ASSERT("Wrong status at pop head max", status == C_OK);
+    MU_ASSERT("Wrong item at pop head max", strcmp(res, "BBB") == 0);
+    cnt = clxns_count(pq);
+    MU_ASSERT("Wrong item return count max", cnt == 1);
+
+    status = priority_queue_pop(pq, (void*)&res);
+    MU_ASSERT("Wrong status at pop head max", status == C_OK);
+    MU_ASSERT("Wrong item at pop head max", strcmp(res, "AAA") == 0);
+    cnt = clxns_count(pq);
+    MU_ASSERT("Wrong item return count max", cnt == 0);
+
+    status = priority_queue_pop(pq, (void*)&res);
+    MU_ASSERT("Wrong status at pop on empty queue max", status == CE_BOUNDS);
+
+    priority_queue_free(pq, 0);
+    return 0;
+}
+
 char* pq_iterate_items()
 {
-    void* pq = priority_queue(0, compare);
+    void* pq = priority_queue_min(0, compare);
     priority_queue_add(pq, "CCC");
     priority_queue_add(pq, "BBB");
     priority_queue_add(pq, "DDD");
@@ -157,7 +204,7 @@ char* pq_iterate_items()
 
 char* pq_copy_queue()
 {
-    void* pq = priority_queue(0, compare);
+    void* pq = priority_queue_min(0, compare);
     priority_queue_add(pq, "CCC");
     priority_queue_add(pq, "BBB");
     priority_queue_add(pq, "DDD");
