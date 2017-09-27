@@ -70,4 +70,23 @@ void* priority_queue_copy(void* pqueue);
 // free the priority queue and its contents if items is non-zero
 void priority_queue_free(void* array, int items);
 
+// == HASH TABLE ==============================================================
+// create and return a new hash table. Specify the initial size.
+void* hash_table(int init_size);
+
+// associate a key with a value
+void hash_table_add(void* table, char* key, void* value);
+
+// return the value associated with the key
+C_STATUS hash_table_get(void* table, char* key, void** value);
+
+// remove the key/value pair
+C_STATUS hash_table_remove(void* table, char* key);
+
+// shallow copy the hash table
+void* hash_table_copy(void* table);
+
+// free the hash table and its contents if items is non-zero
+void hash_table_free(void* table, int items);
+
 #endif
