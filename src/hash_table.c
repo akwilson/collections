@@ -2,12 +2,12 @@
 #include "collections.h"
 #include "common.h"
 
-#define DEF_SIZE 8
+#define DEF_SIZE 7
 
 // An item in the hash table
 typedef struct _node
 {
-    int hash;           // the hash of the key
+    unsigned int hash;  // the hash of the key
     char* key;          // the data key
     void* value;        // the data value
     struct _node* next; // next item in the linked list of nodes
@@ -22,6 +22,23 @@ typedef struct _hash_tab
     int base_cap;  // the initial / minimum size
     int num_array; // number of slots filled in the array
 } hash_tab;
+
+/*
+ * Hashes a string. Courtesy of http://www.cse.yorku.ca/~oz/hash.html
+ */
+unsigned long hash(unsigned char *str)
+{
+    unsigned long hash = 5381;
+    int c;
+
+    while (c = *str++)
+    {
+        // hash * 33 + c
+        hash = ((hash << 5) + hash) + c;
+    }
+
+    return hash;
+}
 
 void* hash_table(int init_size)
 {
