@@ -23,6 +23,9 @@ static char* all_tests()
     MU_RUN_TEST(pq_iterate_items);
     MU_RUN_TEST(pq_copy_queue);
 
+    MU_RUN_TEST(ht_add_items);
+    MU_RUN_TEST(ht_get_items);
+
     return 0;
 }
 

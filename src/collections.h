@@ -5,8 +5,9 @@
 typedef enum
 {
     C_OK         = 0,
-    CE_BOUNDS    = 1,   // requested item was out of bounds of the array
-    CE_NULL_ITEM = 2    // add null item to collection
+    CE_BOUNDS    = 1,  // requested item was out of bounds of the array
+    CE_NULL_ITEM = 2,  // add null item to priority queue
+    CE_MISSING   = 3   // item not found in hash table 
 } C_STATUS;
 
 // == COMMON ==================================================================

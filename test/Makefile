@@ -1,5 +1,5 @@
 BIN = ctest
-SRCS = ctest.c ra_tests.c pq_tests.c
+SRCS = ctest.c ra_tests.c pq_tests.c ht_tests.c
 
 BUILDDIR = ../build
 

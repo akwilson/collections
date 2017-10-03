@@ -1,5 +1,5 @@
 LIB = libclxns.so
-SRCS = common.c priority_queue.c resize_array.c
+SRCS = common.c priority_queue.c resize_array.c hash_table.c
 
 BUILDDIR = ../build
 

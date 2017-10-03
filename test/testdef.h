@@ -20,4 +20,9 @@ char* pq_pop_items_max(void);
 char* pq_iterate_items(void);
 char* pq_copy_queue(void);
 
+// == HASH TABLE ==============================================================
+
+char* ht_add_items(void);
+char* ht_get_items(void);
+
 #endif
