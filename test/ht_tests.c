@@ -36,6 +36,29 @@ char* ht_add_items()
     return 0;
 }
 
+char* ht_replace()
+{
+    void* ht = hash_table(0);
+    hash_table_add(ht, "AAA", "aaa");
+    hash_table_add(ht, "BBB", "bbb");
+    hash_table_add(ht, "AAA", "xxx");
+
+    int cnt = clxns_count(ht);
+    MU_ASSERT("Wrong number of items after add", cnt == 2);
+
+    char* value;
+    C_STATUS st = hash_table_get(ht, "AAA", (void*)&value);
+    MU_ASSERT("Wrong status after first get", st == C_OK);
+    MU_ASSERT("Wrong value after first get", !strcmp("xxx", value));
+
+    st = hash_table_get(ht, "BBB", (void*)&value);
+    MU_ASSERT("Wrong status after first get", st == C_OK);
+    MU_ASSERT("Wrong value after first get", !strcmp("bbb", value));
+
+    hash_table_free(ht, 0);
+    return 0;
+}
+
 char* ht_get_items()
 {
     int num = 30;
@@ -45,9 +68,9 @@ char* ht_get_items()
     MU_ASSERT("Wrong number of items after populate get", cnt == num);
 
     char* value;
-    C_STATUS st = hash_table_get(ht, "string7", (void*)&value);
+    C_STATUS st = hash_table_get(ht, "string0", (void*)&value);
     MU_ASSERT("Wrong status after first get", st == C_OK);
-    MU_ASSERT("Wrong value after first get", !strcmp("STRING7", value));
+    MU_ASSERT("Wrong value after first get", !strcmp("STRING0", value));
 
     // check no item
     st = hash_table_get(ht, "string31", (void*)&value);

@@ -25,6 +25,7 @@ static char* all_tests()
 
     MU_RUN_TEST(ht_add_items);
     MU_RUN_TEST(ht_get_items);
+    MU_RUN_TEST(ht_replace);
 
     return 0;
 }

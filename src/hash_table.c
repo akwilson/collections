@@ -7,7 +7,7 @@
 // An item in the hash table
 typedef struct _node
 {
-    unsigned int hash;  // the hash of the key
+    unsigned long hash;  // the hash of the key
     char* key;          // the data key
     void* value;        // the data value
     struct _node* next; // next item in the linked list of nodes
@@ -17,16 +17,20 @@ typedef struct _node
 typedef struct _hash_tab
 {
     header head;
-    node* array;   // hash table slots
+    node** array;  // hash table slots
     int capacity;  // number of items in the hash_table
     int base_cap;  // the initial / minimum size
     int num_array; // number of slots filled in the array
 } hash_tab;
 
+static void resize(hash_tab* ht, int new_size)
+{
+}
+
 /*
  * Hashes a string. Courtesy of http://www.cse.yorku.ca/~oz/hash.html
  */
-unsigned long hash(unsigned char *str)
+static unsigned long hash(unsigned char *str)
 {
     unsigned long hash = 5381;
     int c;
@@ -40,16 +44,46 @@ unsigned long hash(unsigned char *str)
     return hash;
 }
 
+static int get_slot(unsigned long hash_val, int capacity)
+{
+    return hash_val % capacity;
+}
+
+static node* new_node(char* key, void* value, unsigned long hash_val)
+{
+    node* rv = (node*)malloc(sizeof(node));
+    rv->hash = hash_val;
+    rv->key = key;
+    rv->value = value;
+    rv->next = 0;
+    return rv;
+}
+
+static node** find(node** head, unsigned long hash_val)
+{
+    while (*head)
+    {
+        if ((*head)->hash == hash_val)
+        {
+            return head;
+        }
+
+        head = &(*head)->next;
+    }
+
+    return 0;
+}
+
 void* hash_table(int init_size)
 {
     int sz = init_size == 0 ? DEF_SIZE : init_size;
 
     hash_tab* ht = (hash_tab*)malloc(sizeof(hash_tab));
-    node* array = malloc(sz * sizeof(node));
+    node** array = calloc(sz, sizeof(node*));
     ht->array = array;
     ht->capacity = sz;
     ht->base_cap = sz;
-    ht->capacity = 0;
+    ht->num_array = 0;
 
     ht->head.size = 0;
     ht->head.alloc_iter_state = 0;
@@ -61,12 +95,55 @@ void* hash_table(int init_size)
 
 void hash_table_add(void* table, char* key, void* value)
 {
+    hash_tab* ht = table;
+
+    unsigned long hash_val = hash(key);
+    int slot = get_slot(hash_val, ht->capacity);
+
+    node** head = &ht->array[slot];
+    if (*head)
+    {
+        // collision
+        node** ptr = find(head, hash_val);
+        if (ptr)
+        {
+            (*ptr)->key = key;
+            (*ptr)->value = value;
+            (*ptr)->hash = hash_val;
+            return;
+        }
+    }
+    else
+    {
+        ht->num_array++;
+    }
+
+    node* nn = new_node(key, value, hash_val);
+    nn->next = *head;
+    *head = nn;
+    ht->head.size++;
 }
 
 C_STATUS hash_table_get(void* table, char* key, void** value)
 {
-    *value = "";
-    return C_OK;
+    hash_tab* ht = table;
+
+    unsigned long hash_val = hash(key);
+    int slot = get_slot(hash_val, ht->capacity);
+
+    node** head = &ht->array[slot];
+    if (*head)
+    {
+        node** ptr = find(head, hash_val);
+        if (ptr)
+        {
+            *value = (*ptr)->value;
+            return C_OK;
+        }
+    }
+
+    *value = 0;
+    return CE_MISSING;
 }
 
 C_STATUS hash_table_remove(void* table, char* key)
