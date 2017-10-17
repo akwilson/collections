@@ -1,6 +1,13 @@
 #ifndef COLLECTIONS_H
 #define COLLECTIONS_H
 
+// Key/value pair, returned by the hash table iterator
+typedef struct _kvp
+{
+    char* key;
+    void* value;
+} kvp;
+
 // return codes
 typedef enum
 {

@@ -93,3 +93,56 @@ char* ht_get_items()
     hash_table_free(ht, 1);
     return 0;
 }
+
+char* ht_iterate_sparse()
+{
+    void* ht = hash_table(0);
+    hash_table_add(ht, "AAA", "aaa");
+    hash_table_add(ht, "BBB", "bbb");
+
+    int i = 0;
+    void* iter = clxns_iter_new(ht);
+    while (clxns_iter_move_next(iter))
+    {
+        kvp* val = clxns_iter_get_next(iter);
+        if (!i)
+        {
+            MU_ASSERT("Incorrect key after first iterate", !strcmp(val->key, "AAA"));
+            MU_ASSERT("Incorrect value after first iterate", !strcmp(val->value, "aaa"));
+            i++;
+        }
+        else
+        {
+            MU_ASSERT("Incorrect key after second iterate", !strcmp(val->key, "BBB"));
+            MU_ASSERT("Incorrect value after second iterate", !strcmp(val->value, "bbb"));
+        }
+    }
+
+    clxns_iter_free(iter);
+    hash_table_free(ht, 0);
+    return 0;
+}
+
+char* ht_iterate()
+{
+    int num_entries = 30;
+    void* ht = populate(0, num_entries);
+    char buf[9];
+
+    int i = 0;
+    void* iter = clxns_iter_new(ht);
+    while (clxns_iter_move_next(iter))
+    {
+        kvp* val = clxns_iter_get_next(iter);
+        sprintf(buf, "string%d", i);
+        MU_ASSERT("Incorrect key after iterate", !strcmp(val->key, buf));
+
+        sprintf(buf, "STRING%d", i++);
+        MU_ASSERT("Incorrect value after iterate", !strcmp(val->value, buf));
+    }
+
+    MU_ASSERT("Incorrect iter count", i == num_entries);
+    clxns_iter_free(iter);
+    hash_table_free(ht, 1);
+    return 0;
+}

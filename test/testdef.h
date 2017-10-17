@@ -25,5 +25,7 @@ char* pq_copy_queue(void);
 char* ht_add_items(void);
 char* ht_replace(void);
 char* ht_get_items(void);
+char* ht_iterate_sparse(void);
+char* ht_iterate(void);
 
 #endif

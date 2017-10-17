@@ -7,9 +7,8 @@
 // An item in the hash table
 typedef struct _node
 {
-    unsigned long hash;  // the hash of the key
-    char* key;          // the data key
-    void* value;        // the data value
+    kvp key_value;      // key and value pair
+    unsigned long hash; // the hash of the key
     struct _node* next; // next item in the linked list of nodes
 } node;
 
@@ -53,8 +52,8 @@ static node* new_node(char* key, void* value, unsigned long hash_val)
 {
     node* rv = (node*)malloc(sizeof(node));
     rv->hash = hash_val;
-    rv->key = key;
-    rv->value = value;
+    rv->key_value.key = key;
+    rv->key_value.value = value;
     rv->next = 0;
     return rv;
 }
@@ -107,8 +106,8 @@ void hash_table_add(void* table, char* key, void* value)
         node** ptr = find(head, hash_val);
         if (ptr)
         {
-            (*ptr)->key = key;
-            (*ptr)->value = value;
+            (*ptr)->key_value.key = key;
+            (*ptr)->key_value.value = value;
             (*ptr)->hash = hash_val;
             return;
         }
@@ -137,7 +136,7 @@ C_STATUS hash_table_get(void* table, char* key, void** value)
         node** ptr = find(head, hash_val);
         if (ptr)
         {
-            *value = (*ptr)->value;
+            *value = (*ptr)->key_value.value;
             return C_OK;
         }
     }
