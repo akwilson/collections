@@ -12,6 +12,14 @@ typedef struct _node
     struct _node* next; // next item in the linked list of nodes
 } node;
 
+// set of pointers to iterate over the hash table
+typedef struct _iter_ptrs
+{
+    node** head; // first node in the hash table array
+    node** tail; // last node in the hash table array
+    node* next;  // next item pointer
+} iter_ptr;
+
 // The hash table
 typedef struct _hash_tab
 {
@@ -24,6 +32,50 @@ typedef struct _hash_tab
 
 static void resize(hash_tab* ht, int new_size)
 {
+}
+
+static void* alloc_iter_state(void* table)
+{
+    hash_tab* ht = table;
+    iter_ptr* rv = (iter_ptr*)malloc(sizeof(iter_ptr));
+    for (int i = 0; i < ht->capacity; i++)
+    {
+        rv->head = ht->array + i;
+        if (*(rv->head))
+        {
+            break;
+        }
+    }
+
+    rv->tail = ht->array + ht->capacity - 1;
+    rv->next = *(rv->head);
+    return rv;
+}
+
+static int get_next_iter(void* table, void* iter_state, void** next)
+{
+    iter_ptr* iptr = iter_state;
+
+    if (iptr->next)
+    {
+        *next = &iptr->next->key_value;
+        iptr->next = iptr->next->next;
+
+        if (!iptr->next && iptr->head != iptr->tail)
+        {
+            do
+            {
+                iptr->head++;
+            } while (!iptr->head && iptr->head != iptr->tail);
+
+            iptr->next = iptr->head ? *(iptr->head) : 0;
+        }
+
+        return 1;
+    }
+
+    *next = 0;
+    return 0;
 }
 
 /*
@@ -85,8 +137,8 @@ void* hash_table(int init_size)
     ht->num_array = 0;
 
     ht->head.size = 0;
-    ht->head.alloc_iter_state = 0;
-    ht->head.get_next_iter = 0;
+    ht->head.alloc_iter_state = alloc_iter_state;
+    ht->head.get_next_iter = get_next_iter;
     ht->head.free_iter = 0;
 
     return ht;
