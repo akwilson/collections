@@ -95,9 +95,12 @@ static unsigned long hash(unsigned char *str)
     return hash;
 }
 
-static int get_slot(unsigned long hash_val, int capacity)
+static node** get_slot_head(hash_tab* ht, unsigned char* key, unsigned long *hash_val)
 {
-    return hash_val % capacity;
+    *hash_val = hash(key);
+    int slot = *hash_val % ht->capacity;
+
+    return &ht->array[slot];
 }
 
 static node* new_node(char* key, void* value, unsigned long hash_val)
@@ -148,10 +151,8 @@ void hash_table_add(void* table, char* key, void* value)
 {
     hash_tab* ht = table;
 
-    unsigned long hash_val = hash(key);
-    int slot = get_slot(hash_val, ht->capacity);
-
-    node** head = &ht->array[slot];
+    unsigned long hash_val;
+    node** head = get_slot_head(ht, key, &hash_val);
     if (*head)
     {
         // collision
@@ -179,10 +180,8 @@ C_STATUS hash_table_get(void* table, char* key, void** value)
 {
     hash_tab* ht = table;
 
-    unsigned long hash_val = hash(key);
-    int slot = get_slot(hash_val, ht->capacity);
-
-    node** head = &ht->array[slot];
+    unsigned long hash_val;
+    node** head = get_slot_head(ht, key, &hash_val);
     if (*head)
     {
         node** ptr = find(head, hash_val);
@@ -201,10 +200,8 @@ C_STATUS hash_table_remove(void* table, char* key)
 {
     hash_tab* ht = table;
 
-    unsigned long hash_val = hash(key);
-    int slot = get_slot(hash_val, ht->capacity);
-
-    node** head = &ht->array[slot];
+    unsigned long hash_val;
+    node** head = get_slot_head(ht, key, &hash_val);
     if (*head)
     {
         node** ptr = find(head, hash_val);
