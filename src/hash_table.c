@@ -199,7 +199,31 @@ C_STATUS hash_table_get(void* table, char* key, void** value)
 
 C_STATUS hash_table_remove(void* table, char* key)
 {
-    return C_OK;
+    hash_tab* ht = table;
+
+    unsigned long hash_val = hash(key);
+    int slot = get_slot(hash_val, ht->capacity);
+
+    node** head = &ht->array[slot];
+    if (*head)
+    {
+        node** ptr = find(head, hash_val);
+        if (ptr)
+        {
+            node* rm = (*ptr);
+            if (head == ptr && rm->next == 0)
+            {
+                ht->num_array--;
+            }
+
+            (*ptr) = rm->next;
+            free(rm);
+            ht->head.size--;
+            return C_OK;
+        }
+    }
+
+    return CE_MISSING;
 }
 
 void* hash_table_copy(void* table)

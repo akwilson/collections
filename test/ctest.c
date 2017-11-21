@@ -29,6 +29,7 @@ static char* all_tests()
     MU_RUN_TEST(ht_iterate_sparse);
     MU_RUN_TEST(ht_iterate);
     MU_RUN_TEST(ht_iterate_empty);
+    MU_RUN_TEST(ht_remove_items);
 
     return 0;
 }

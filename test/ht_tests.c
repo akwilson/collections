@@ -166,3 +166,31 @@ char* ht_iterate_empty()
     clxns_iter_free(iter);
     return 0;
 }
+
+char* ht_remove_items()
+{
+    int num = 30;
+    void* ht = populate(0, num);
+
+    C_STATUS st = hash_table_remove(ht, "string31");
+    MU_ASSERT("Wrong status after first remove", st == CE_MISSING);
+
+    int cnt;
+    char *k, *value;
+    for (int i = 0; i < num; i++)
+    {
+        k = (char*)malloc(9);
+        sprintf(k, "string%d", i);
+        st = hash_table_remove(ht, k);
+        MU_ASSERT("Wrong status after loop remove", st == C_OK);
+
+        st = hash_table_get(ht, k, (void*)&value);
+        MU_ASSERT("Wrong status after remove get", st == CE_MISSING);
+
+        cnt = clxns_count(ht);
+        MU_ASSERT("Wrong number of items after remove", cnt == num - i - 1);
+    }
+
+    hash_table_free(ht, 1);
+    return 0;
+}
