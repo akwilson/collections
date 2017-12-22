@@ -30,6 +30,7 @@ static char* all_tests()
     MU_RUN_TEST(ht_iterate);
     MU_RUN_TEST(ht_iterate_empty);
     MU_RUN_TEST(ht_remove_items);
+    MU_RUN_TEST(ht_copy);
 
     return 0;
 }

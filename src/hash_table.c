@@ -32,6 +32,12 @@ typedef struct _hash_tab
 
 static void resize(hash_tab* ht, int new_size)
 {
+    // malloc ht.capacity * 2; assign to ptr
+    // iterate over original table nodes
+    // find new slot
+    // add to head of list
+    // assign ht.array to ptr
+    // free original array
 }
 
 static void* alloc_iter_state(void* table)
@@ -52,13 +58,13 @@ static void* alloc_iter_state(void* table)
     return rv;
 }
 
-static int get_next_iter(void* table, void* iter_state, void** next)
+static int get_next_node(void* iter_state, node** next)
 {
     iter_ptr* iptr = iter_state;
 
     if (iptr->next)
     {
-        *next = &iptr->next->key_value;
+        *next = iptr->next;
         iptr->next = iptr->next->next;
 
         if (!iptr->next && iptr->head != iptr->tail)
@@ -71,6 +77,19 @@ static int get_next_iter(void* table, void* iter_state, void** next)
             iptr->next = iptr->head ? *(iptr->head) : 0;
         }
 
+        return 1;
+    }
+
+    *next = 0;
+    return 0;
+}
+
+static int get_next_iter(void* table, void* iter_state, void** next)
+{
+    node* nn;
+    if (get_next_node(iter_state, &nn))
+    {
+        *next = &nn->key_value;
         return 1;
     }
 
@@ -225,9 +244,29 @@ C_STATUS hash_table_remove(void* table, char* key)
 
 void* hash_table_copy(void* table)
 {
-    return 0;
+    // memcpy table
+    // iterate over table nodes
+    // add to head of new table
+    return table;
 }
 
 void hash_table_free(void* table, int items)
 {
+    hash_tab* ht = table;
+    iter_ptr* iter = alloc_iter_state(table);
+    node* next;
+    while (get_next_node(iter, &next))
+    {
+        if (items)
+        {
+            free(next->key_value.key);
+            free(next->key_value.value);
+        }
+
+        free(next);
+    }
+
+    free(ht->array);
+    free(ht);
+    free(iter);
 }

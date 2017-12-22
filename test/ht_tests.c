@@ -90,7 +90,7 @@ char* ht_get_items()
         MU_ASSERT("Wrong value after loop get", !strcmp(v, value));
     }
 
-    hash_table_free(ht, 1);
+    hash_table_free(ht, 0);
     return 0;
 }
 
@@ -192,5 +192,37 @@ char* ht_remove_items()
     }
 
     hash_table_free(ht, 1);
+    return 0;
+}
+
+char* ht_copy()
+{
+    void* ht = hash_table(0);
+    hash_table_add(ht, "AAA", "aaa");
+    hash_table_add(ht, "BBB", "bbb");
+    hash_table_add(ht, "XXX", "xxx");
+    hash_table_add(ht, "GGG", "ggg");
+    hash_table_add(ht, "QQQ", "qqq");
+
+    void* ht2 = hash_table_copy(ht);
+
+    int cnt = clxns_count(ht2);
+    MU_ASSERT("Wrong number of items after copy", cnt == 5);
+
+    hash_table_add(ht, "ZZZ", "zzz");
+    cnt = clxns_count(ht2);
+    MU_ASSERT("Wrong number of items after copy insert", cnt == 6);
+    cnt = clxns_count(ht);
+    MU_ASSERT("Wrong number of items after copy insert orig", cnt == 5);
+
+    char* value;
+    C_STATUS st = hash_table_get(ht, "ZZZ", (void*)&value);
+    MU_ASSERT("Wrong status after copy orig get", st == CE_MISSING);
+    st = hash_table_get(ht2, "ZZZ", (void*)&value);
+    MU_ASSERT("Wrong status after copy new get", st == C_OK);
+    MU_ASSERT("Wrong value after copy new get", !strcmp("zzz", value));
+
+    hash_table_free(ht, 0);
+    hash_table_free(ht2, 0);
     return 0;
 }
