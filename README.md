@@ -32,3 +32,10 @@ while (clxns_iter_move_next(iter))
 
 clxns_iter_free(iter);
 ```
+
+## Building and Running Unit Tests
+in the top level directory
+```
+$ make
+$ ./scripts/runTests.sh
+```

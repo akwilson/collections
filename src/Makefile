@@ -12,7 +12,6 @@ CFLAGS = -g -I. -I /usr/local/include
 $(BUILDDIR)/%.o : %.c
 	@echo $(COMPILE.c) -MMD -fpic -o $@ $<
 	@$(COMPILE.c) -MMD -fpic -o $@ $<
-	@sed -i 's,\($(BUILDDIR)/$*\.o\)[ :]*\(.*\),$@ : $$\(wildcard \2\)\n\1 : \2,g' $(BUILDDIR)/$*.d
 
 all : $(LIB_OUT)
 
