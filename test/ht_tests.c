@@ -124,28 +124,37 @@ char* ht_iterate_sparse()
     return 0;
 }
 
+/*
+ * Test the hash table iterator.
+ *
+ * Key/value pairs take the form "STRING${INDEX_VALUE}". The order of items returned is uncertain, so
+ * this test checks that each key and value is the same index * value and that the sum of the index
+ * values is as expected.
+ */
 char* ht_iterate()
 {
     int num_entries = 30;
-    void* ht = populate(0, num_entries);
+    void *ht = populate(0, num_entries);
     char buf[9];
 
-    int i = 0;
-    void* iter = clxns_iter_new(ht);
+    int i = 0, idx_tot = 0;
+    void *iter = clxns_iter_new(ht);
     while (clxns_iter_move_next(iter))
     {
-        kvp* val = clxns_iter_get_next(iter);
-        printf("%s %s\n", val->key, val->value);
-        /*
-        sprintf(buf, "string%d", i);
-        MU_ASSERT("Incorrect key after iterate", !strcmp(val->key, buf));
+        kvp *val = clxns_iter_get_next(iter);
+        char* idx = val->key + 6;
+        int key_idx = atoi(idx);
 
-        sprintf(buf, "STRING%d", i++);
-        MU_ASSERT("Incorrect value after iterate", !strcmp(val->value, buf));
-        */
+        idx = val->value + 6;
+        int val_idx = atoi(idx);
+        MU_ASSERT("Key and value indexes do not match", key_idx == val_idx);
+
+        idx_tot += val_idx;
         i++;
     }
 
+    int expected_idx_tot = num_entries * (num_entries - 1) / 2;
+    MU_ASSERT("Index totals incorrect. Missing or dupe values in table?", idx_tot == expected_idx_tot);
     MU_ASSERT("Incorrect iter count", i == num_entries);
     clxns_iter_free(iter);
     hash_table_free(ht, 1);
@@ -195,27 +204,37 @@ char* ht_remove_items()
     return 0;
 }
 
-char* ht_copy()
+/*
+ * Copy a hash table. Should copy the table and all of its structures, does not copy the items in the table.
+ */
+char *ht_copy()
 {
-    void* ht = hash_table(0);
+    // Create a new hash tble and add a few items
+    void *ht = hash_table(0);
     hash_table_add(ht, "AAA", "aaa");
     hash_table_add(ht, "BBB", "bbb");
     hash_table_add(ht, "XXX", "xxx");
     hash_table_add(ht, "GGG", "ggg");
     hash_table_add(ht, "QQQ", "qqq");
 
-    void* ht2 = hash_table_copy(ht);
+    // Copy it
+    void *ht2 = hash_table_copy(ht);
 
     int cnt = clxns_count(ht2);
     MU_ASSERT("Wrong number of items after copy", cnt == 5);
 
-    hash_table_add(ht, "ZZZ", "zzz");
+    /*
+     * Add an item to the new hash table. Check the the original is untouched and the item is
+     * added only to the copy. First check table length.
+     */
+    hash_table_add(ht2, "ZZZ", "zzz");
     cnt = clxns_count(ht2);
     MU_ASSERT("Wrong number of items after copy insert", cnt == 6);
     cnt = clxns_count(ht);
     MU_ASSERT("Wrong number of items after copy insert orig", cnt == 5);
 
-    char* value;
+    // Then check the new item can be found
+    char *value;
     C_STATUS st = hash_table_get(ht, "ZZZ", (void*)&value);
     MU_ASSERT("Wrong status after copy orig get", st == CE_MISSING);
     st = hash_table_get(ht2, "ZZZ", (void*)&value);
