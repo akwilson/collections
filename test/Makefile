@@ -4,26 +4,24 @@ SRCS = ctest.c ra_tests.c pq_tests.c ht_tests.c
 BUILDDIR = ../build
 
 BIN_OUT = $(addprefix $(BUILDDIR)/, $(BIN))
-OBJS = $(SRCS:.c=.o)
-DEPS = $(SRCS:.c=.d)
+OBJS = $(SRCS:%.c=$(addprefix $(BUILDDIR)/, %.o))
+DEPS = $(OBJS:%.o=%.d)
 CFLAGS = -g -I. -I /usr/local/include
 #LDFLAGS = -linker_flags
 LIB_PATH = ../build
-RUN_PATH = $(CURDIR)/../build
 LIBS = -lclxns
 
 $(BUILDDIR)/%.o : %.c
 	@echo $(COMPILE.c) -MMD -o $@ $<
 	@$(COMPILE.c) -MMD -o $@ $<
 
-all : $(BIN_OUT) $(BIN1_OUT) $(BIN2_OUT)
+all : $(BIN_OUT)
 
-$(BIN_OUT) : $(addprefix $(BUILDDIR)/, $(OBJS))
+$(BIN_OUT) : $(OBJS)
 	$(LINK.c) $^ -L$(LIB_PATH) $(LIBS) -o $@
+
+-include $(DEPS)
 
 .PHONY: clean
 clean :
-	rm $(addprefix $(BUILDDIR)/, $(OBJS)) \
-		$(addprefix $(BUILDDIR)/, $(DEPS)) \
-		$(BIN_OUT) \
-		$(BIN1_OUT)
+	rm -f $(OBJS) $(DEPS) $(BIN_OUT)
