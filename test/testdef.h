@@ -27,6 +27,7 @@ char* ht_replace(void);
 char* ht_get_items(void);
 char* ht_iterate_sparse(void);
 char* ht_iterate(void);
+char* ht_iterate_sparse_ish(void);
 char* ht_iterate_empty(void);
 char* ht_remove_items(void);
 char* ht_copy(void);

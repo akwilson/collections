@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include "collections.h"
 #include "common.h"
 
@@ -72,7 +73,7 @@ static int get_next_node(void* iter_state, node** next)
             do
             {
                 iptr->head++;
-            } while (!iptr->head && iptr->head != iptr->tail);
+            } while (!(*iptr->head) && iptr->head != iptr->tail);
 
             iptr->next = iptr->head ? *(iptr->head) : 0;
         }
@@ -242,14 +243,29 @@ C_STATUS hash_table_remove(void* table, char* key)
     return CE_MISSING;
 }
 
-void* hash_table_copy(void* table)
+/*
+ * Copies a hash table. Performs a shallow copy by creating a new table and adding
+ * all of the values from the original in to it.
+ */
+void *hash_table_copy(void *table)
 {
-    // memcpy table
-    // iterate over table nodes
-    // add to head of new table
-    return table;
+    hash_tab *orig = table;
+    hash_tab *rv = hash_table(orig->capacity);
+
+    void *iter = alloc_iter_state(orig);
+    node *nn;
+    while (get_next_node(iter, &nn)) {
+        hash_table_add(rv, nn->key_value.key, nn->key_value.value);
+    }
+
+    free(iter);
+    return rv;
 }
 
+/*
+ * Frees a hash table. If items is non-zero this method will also attempt to free any memory
+ * pointed to by the keys and values.
+ */
 void hash_table_free(void* table, int items)
 {
     hash_tab* ht = table;

@@ -131,7 +131,7 @@ char* ht_iterate_sparse()
  * this test checks that each key and value is the same index * value and that the sum of the index
  * values is as expected.
  */
-char* ht_iterate()
+char *ht_iterate()
 {
     int num_entries = 30;
     void *ht = populate(0, num_entries);
@@ -158,6 +158,31 @@ char* ht_iterate()
     MU_ASSERT("Incorrect iter count", i == num_entries);
     clxns_iter_free(iter);
     hash_table_free(ht, 1);
+    return 0;
+}
+
+char *ht_iterate_sparse_ish()
+{
+    // Create a new hash table and add a small number of items
+    void *ht = hash_table(0);
+    hash_table_add(ht, "AAA", "aaa");
+    hash_table_add(ht, "BBB", "bbb");
+    hash_table_add(ht, "XXX", "xxx");
+    hash_table_add(ht, "GGG", "ggg");
+    hash_table_add(ht, "QQQ", "qqq");
+
+    int i = 0;
+    void *iter = clxns_iter_new(ht);
+    while (clxns_iter_move_next(iter))
+    {
+        kvp *val = clxns_iter_get_next(iter);
+        i++;
+    }
+
+    MU_ASSERT("Incorrect iter count for sparse-ish table", i == 5);
+    clxns_iter_free(iter);
+    hash_table_free(ht, 0);
+
     return 0;
 }
 
