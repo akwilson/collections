@@ -3,6 +3,7 @@
 #include "collections.h"
 #include "common.h"
 
+// Default size of a hash table if none is supplied by the user
 #define DEF_SIZE 7
 
 // An item in the hash table
@@ -10,41 +11,34 @@ typedef struct _node
 {
     kvp key_value;      // key and value pair
     unsigned long hash; // the hash of the key
-    struct _node* next; // next item in the linked list of nodes
+    struct _node *next; // next item in the linked list of nodes
 } node;
 
-// set of pointers to iterate over the hash table
+// Set of pointers to iterate over the hash table
 typedef struct _iter_ptrs
 {
-    node** head; // first node in the hash table array
-    node** tail; // last node in the hash table array
-    node* next;  // next item pointer
+    node **head; // first node in the hash table array
+    node **tail; // last node in the hash table array
+    node *next;  // next item pointer
 } iter_ptr;
 
 // The hash table
 typedef struct _hash_tab
 {
     header head;
-    node** array;  // hash table slots
+    node **array;  // hash table slots
     int capacity;  // number of items in the hash_table
     int base_cap;  // the initial / minimum size
     int num_array; // number of slots filled in the array
 } hash_tab;
 
-static void resize(hash_tab* ht, int new_size)
+/*
+ * Creates a new hash table iterator and points it to the first item in the table.
+ */
+static void *alloc_iter_state(void *table)
 {
-    // malloc ht.capacity * 2; assign to ptr
-    // iterate over original table nodes
-    // find new slot
-    // add to head of list
-    // assign ht.array to ptr
-    // free original array
-}
-
-static void* alloc_iter_state(void* table)
-{
-    hash_tab* ht = table;
-    iter_ptr* rv = (iter_ptr*)malloc(sizeof(iter_ptr));
+    hash_tab *ht = table;
+    iter_ptr *rv = (iter_ptr*)malloc(sizeof(iter_ptr));
     for (int i = 0; i < ht->capacity; i++)
     {
         rv->head = ht->array + i;
@@ -70,6 +64,7 @@ static int get_next_node(void* iter_state, node** next)
 
         if (!iptr->next && iptr->head != iptr->tail)
         {
+            // Find the next occupied slot in the array
             do
             {
                 iptr->head++;
@@ -96,6 +91,35 @@ static int get_next_iter(void* table, void* iter_state, void** next)
 
     *next = 0;
     return 0;
+}
+
+/*
+ * Resize the hash table to the new size. Allows the hash table to expand and shrink as items
+ * are added and removed. Stops too many items colliding and being added to sequential searches
+ * when the table is growing.
+ *
+ * A resize operation creates a new array in the hash table and iterates over all nodes to
+ * find them a new slot.
+ */
+static void resize(hash_tab *ht, int new_size)
+{
+    node **array = calloc(new_size, sizeof(node*));
+
+    void *iter = alloc_iter_state(ht);
+    node *nn;
+    while (get_next_node(iter, &nn))
+    {
+        int slot = nn->hash % new_size;
+        node **head = &array[slot];
+        nn->next = *head;
+        *head = nn;
+    }
+
+    free(iter);
+    free(ht->array);
+
+    ht->array = array;
+    ht->capacity = new_size;
 }
 
 /*
@@ -148,12 +172,12 @@ static node** find(node** head, unsigned long hash_val)
     return 0;
 }
 
-void* hash_table(int init_size)
+void *hash_table(int init_size)
 {
-    int sz = init_size == 0 ? DEF_SIZE : init_size;
+    int sz = init_size <= DEF_SIZE ? DEF_SIZE : init_size;
 
-    hash_tab* ht = (hash_tab*)malloc(sizeof(hash_tab));
-    node** array = calloc(sz, sizeof(node*));
+    hash_tab *ht = (hash_tab*)malloc(sizeof(hash_tab));
+    node **array = calloc(sz, sizeof(node*));
     ht->array = array;
     ht->capacity = sz;
     ht->base_cap = sz;
@@ -167,16 +191,21 @@ void* hash_table(int init_size)
     return ht;
 }
 
-void hash_table_add(void* table, char* key, void* value)
+void hash_table_add(void *table, char *key, void *value)
 {
-    hash_tab* ht = table;
+    hash_tab *ht = table;
+
+    if (ht->num_array > ht->capacity / 2)
+    {
+        resize(ht, ht->capacity * 2);
+    }
 
     unsigned long hash_val;
-    node** head = get_slot_head(ht, key, &hash_val);
+    node **head = get_slot_head(ht, key, &hash_val);
     if (*head)
     {
         // collision
-        node** ptr = find(head, hash_val);
+        node **ptr = find(head, hash_val);
         if (ptr)
         {
             (*ptr)->key_value.key = key;
@@ -190,7 +219,7 @@ void hash_table_add(void* table, char* key, void* value)
         ht->num_array++;
     }
 
-    node* nn = new_node(key, value, hash_val);
+    node *nn = new_node(key, value, hash_val);
     nn->next = *head;
     *head = nn;
     ht->head.size++;
@@ -219,6 +248,11 @@ C_STATUS hash_table_get(void* table, char* key, void** value)
 C_STATUS hash_table_remove(void* table, char* key)
 {
     hash_tab* ht = table;
+
+    if (ht->num_array > ht->base_cap && ht->num_array <= ht->capacity / 4)
+    {
+        resize(ht, ht->capacity / 4);
+    }
 
     unsigned long hash_val;
     node** head = get_slot_head(ht, key, &hash_val);
@@ -254,7 +288,8 @@ void *hash_table_copy(void *table)
 
     void *iter = alloc_iter_state(orig);
     node *nn;
-    while (get_next_node(iter, &nn)) {
+    while (get_next_node(iter, &nn))
+    {
         hash_table_add(rv, nn->key_value.key, nn->key_value.value);
     }
 
