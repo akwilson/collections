@@ -17,14 +17,14 @@ typedef struct rs_array
 {
     header head;
     void **buff;  // the data in the array
-    int capacity; // the number of items allocated to the array
-    int base_cap; // the intial / minimum size
+    size_t capacity; // the number of items allocated to the array
+    size_t base_cap; // the intial / minimum size
 } rs_array;
 
 /*
  * Does the actual array resizing
  */
-static void resize(rs_array *ra, int new_size)
+static void resize(rs_array *ra, size_t new_size)
 {
     void **buffer = realloc(ra->buff, new_size * sizeof(void*));
     ra->buff = buffer;
@@ -59,9 +59,9 @@ static int get_next_iter(void *array, void *iter_state, void **next)
  * Creates a new resizable array. Uses the default size if none is
  * specified by the user.
  */
-void *resize_array(int init_size)
+void *resize_array(size_t init_size)
 {
-    int sz = init_size <= DEF_SIZE ? DEF_SIZE : init_size;
+    size_t sz = init_size <= DEF_SIZE ? DEF_SIZE : init_size;
     rs_array *rv = (rs_array*)malloc(sizeof(rs_array));
     void **buffer = malloc(sz * sizeof(void*));
     rv->buff = buffer;
@@ -94,10 +94,10 @@ void resize_array_add(void *array, void *item)
  * Gets at item from the resizable array at the index specified. The item
  * parameter will point to the data item.
  */
-C_STATUS resize_array_get(void *array, int index, void **item)
+C_STATUS resize_array_get(void *array, size_t index, void **item)
 {
     rs_array *ra = array;
-    if (index < 0 || index >= ra->head.size)
+    if (index >= ra->head.size)
     {
         return CE_BOUNDS;
     }
@@ -109,11 +109,10 @@ C_STATUS resize_array_get(void *array, int index, void **item)
 /*
  * Swaps two items in the array at the index values specified.
  */
-C_STATUS resize_array_exchange(void *array, int first, int second)
+C_STATUS resize_array_exchange(void *array, size_t first, size_t second)
 {
     rs_array *ra = array;
-    if (first < 0 || first >= ra->head.size ||
-        second < 0 || second >= ra->head.size)
+    if (first >= ra->head.size || second >= ra->head.size)
     {
         return CE_BOUNDS;
     }
@@ -128,7 +127,7 @@ C_STATUS resize_array_exchange(void *array, int first, int second)
  * Removes an item from the array and shuffles everything after that
  * point back one space. Reallcoates the array if it's one quarter full.
  */
-C_STATUS resize_array_remove(void *array, int index, void **item)
+C_STATUS resize_array_remove(void *array, size_t index, void **item)
 {
     rs_array *ra = array;
     void *rv;
@@ -142,7 +141,7 @@ C_STATUS resize_array_remove(void *array, int index, void **item)
         *item = rv;
     }
 
-    for (int i = index; i < ra->head.size - 1; i++)
+    for (size_t i = index; i < ra->head.size - 1; i++)
     {
         ra->buff[i] = ra->buff[i + 1];
     }
@@ -180,7 +179,7 @@ void resize_array_free(void *array, int items)
     rs_array *ra = array;
     if (items)
     {
-        for (int i = 0; i < ra->head.size; i++)
+        for (size_t i = 0; i < ra->head.size; i++)
         {
             free(ra->buff[i]);
         }

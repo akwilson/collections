@@ -41,7 +41,7 @@ static void free_iter(void *iter_state)
  * Uses the comparison function to compare two items in the
  * queue at the index positions specified
  */
-static int checkVals(p_queue *pq, int first, int second)
+static int checkVals(p_queue *pq, size_t first, size_t second)
 {
     void *fVal;
     void *sVal;
@@ -60,11 +60,11 @@ static int checkVals(p_queue *pq, int first, int second)
 /*
  * Push a key further down the priority queue
  */
-static void sink(p_queue *pq, int key)
+static void sink(p_queue *pq, size_t key)
 {
     while (2 * key < pq->head.size)
     {
-        int j = 2 * key;
+        size_t j = 2 * key;
         if (j < pq->head.size && checkVals(pq, j, j + 1))
         {
             j++;
@@ -83,7 +83,7 @@ static void sink(p_queue *pq, int key)
 /*
  * Promote a key further up the priority queue
  */
-static void swim(p_queue *pq, int key)
+static void swim(p_queue *pq, size_t key)
 {
     while (key > 1 && checkVals(pq, key / 2, key))
     {
@@ -96,7 +96,7 @@ static void swim(p_queue *pq, int key)
  * Creates a new priority queue. Values are sorted based on the compare function. The order
  * parameter indicates direction.
  */
-static void *new_pq(int init_size, int order, int (*compare)(void *first, void *second))
+static void *new_pq(size_t init_size, int order, int (*compare)(void *first, void *second))
 {
     p_queue *rv = (p_queue*)malloc(sizeof(p_queue));
     rv->array = resize_array(init_size);
@@ -115,7 +115,7 @@ static void *new_pq(int init_size, int order, int (*compare)(void *first, void *
 /*
  * Creates a new priority queue. Values are sorted based on the compare function. Smallest items first.
  */
-void *priority_queue_min(int init_size, int (*compare)(void *first, void *second))
+void *priority_queue_min(size_t init_size, int (*compare)(void *first, void *second))
 {
     return new_pq(init_size, 0, compare);
 }
@@ -123,7 +123,7 @@ void *priority_queue_min(int init_size, int (*compare)(void *first, void *second
 /*
  * Creates a new priority queue. Values are sorted based on the compare function. Largest items first.
  */
-void *priority_queue_max(int init_size, int (*compare)(void *first, void *second))
+void *priority_queue_max(size_t init_size, int (*compare)(void *first, void *second))
 {
     return new_pq(init_size, 1, compare);
 }

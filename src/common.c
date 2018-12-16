@@ -16,7 +16,7 @@ typedef struct {
 /*
  * Returns the number of items in the collection
  */
-int clxns_count(void *collection)
+size_t clxns_count(void *collection)
 {
     header *head = collection;
     return head->size;

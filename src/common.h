@@ -8,7 +8,7 @@
 typedef struct header
 {
     // number of items in the collection
-    int size;
+    size_t size;
     // allocates state for the iterator
     void* (*alloc_iter_state)(void* collection);
     // gets the next iterator item in the collection

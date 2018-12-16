@@ -31,9 +31,9 @@ typedef struct _hash_tab
 {
     header head;
     node **array;  // hash table slots
-    int capacity;  // number of items in the hash_table
-    int base_cap;  // the initial / minimum size
-    int num_array; // number of slots filled in the array
+    size_t capacity;  // number of items in the hash_table
+    size_t base_cap;  // the initial / minimum size
+    size_t num_array; // number of slots filled in the array
 } hash_tab;
 
 /*
@@ -43,7 +43,7 @@ static void *alloc_iter_state(void *table)
 {
     hash_tab *ht = table;
     iter_ptr *rv = (iter_ptr*)malloc(sizeof(iter_ptr));
-    for (int i = 0; i < ht->capacity; i++)
+    for (size_t i = 0; i < ht->capacity; i++)
     {
         rv->head = ht->array + i;
         if (*(rv->head))
@@ -113,7 +113,7 @@ static int get_next_iter(void *table, void *iter_state, void **next)
  * A resize operation creates a new array in the hash table and iterates over all nodes to
  * find them a new slot.
  */
-static void resize(hash_tab *ht, int new_size)
+static void resize(hash_tab *ht, size_t new_size)
 {
     node **array = calloc(new_size, sizeof(node*));
 
@@ -197,9 +197,9 @@ static node **find(node **head, unsigned long hash_val)
 /*
  * Creates a new hash table. Uses the default size if no value is provided by the user.
  */
-void *hash_table(int init_size)
+void *hash_table(size_t init_size)
 {
-    int sz = init_size <= DEF_SIZE ? DEF_SIZE : init_size;
+    size_t sz = init_size <= DEF_SIZE ? DEF_SIZE : init_size;
 
     hash_tab *ht = (hash_tab*)malloc(sizeof(hash_tab));
     node **array = calloc(sz, sizeof(node*));
