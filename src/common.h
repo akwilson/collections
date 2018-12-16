@@ -1,9 +1,10 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+// Useful macro to repress unused warnings from the compiler
 #define UNUSED(...) (void)(__VA_ARGS__)
 
-// header object common to all collections
+// Header object common to all collections
 typedef struct header
 {
     // number of items in the collection
