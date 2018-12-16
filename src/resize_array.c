@@ -1,54 +1,69 @@
+/*
+ * Implementation of the resizing array. The array expands and contracts
+ * as items are added to and removed from it.
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include "common.h"
 #include "collections.h"
 
+// Default size if none is provided by the user
 #define DEF_SIZE 8
 
+// The resize array structure
 typedef struct rs_array
 {
     header head;
-    void** buff;  // the data in the array
+    void **buff;  // the data in the array
     int capacity; // the number of items allocated to the array
     int base_cap; // the intial / minimum size
 } rs_array;
 
 /*
- * Does the actual resizing
+ * Does the actual array resizing
  */
-static void resize(rs_array* ra, int new_size)
+static void resize(rs_array *ra, int new_size)
 {
-    void** buffer = realloc(ra->buff, new_size * sizeof(void*));
+    void **buffer = realloc(ra->buff, new_size * sizeof(void*));
     ra->buff = buffer;
     ra->capacity = new_size;
 }
 
 /*
+ * Creates a new iterator and points it to the first item in the array.
  * Allocates an integer to keep track of the position in the array
  */
-static void* alloc_iter_state(void* array)
+static void *alloc_iter_state(void *array)
 {
     UNUSED(array);
 
-    int* st = (int*)malloc(sizeof(int));
+    int *st = (int*)malloc(sizeof(int));
     *st = 0;
     return st;
 }
 
-static int get_next_iter(void* array, void* iter_state, void** next)
+/*
+ * Gets the next item from the iterator
+ */
+static int get_next_iter(void *array, void *iter_state, void **next)
 {
-    int* cur = (int*)iter_state;
+    int *cur = (int*)iter_state;
     C_STATUS st = resize_array_get(array, *cur, next);
     (*cur)++;
     return st == C_OK;
 }
 
-void* resize_array(int init_size)
+/*
+ * Creates a new resizable array. Uses the default size if none is
+ * specified by the user.
+ */
+void *resize_array(int init_size)
 {
     int sz = init_size == 0 ? DEF_SIZE : init_size;
-    rs_array* rv = (rs_array*)malloc(sizeof(rs_array));
-    void** buffer = malloc(sz * sizeof(void*));
+    rs_array *rv = (rs_array*)malloc(sizeof(rs_array));
+    void **buffer = malloc(sz * sizeof(void*));
     rv->buff = buffer;
     rv->capacity = sz;
     rv->base_cap = sz;
@@ -62,9 +77,9 @@ void* resize_array(int init_size)
 /*
  * Adds an item to the array. Doubles the size of the array when full.
  */
-void resize_array_add(void* array, void* item)
+void resize_array_add(void *array, void *item)
 {
-    rs_array* ra = array;
+    rs_array *ra = array;
 
     if (ra->head.size == ra->capacity)
     {
@@ -75,9 +90,13 @@ void resize_array_add(void* array, void* item)
     ra->head.size++;
 }
 
-C_STATUS resize_array_get(void* array, int index, void** item)
+/*
+ * Gets at item from the resizable array at the index specified. The item
+ * parameter will point to the data item.
+ */
+C_STATUS resize_array_get(void *array, int index, void **item)
 {
-    rs_array* ra = array;
+    rs_array *ra = array;
     if (index < 0 || index >= ra->head.size)
     {
         return CE_BOUNDS;
@@ -87,16 +106,19 @@ C_STATUS resize_array_get(void* array, int index, void** item)
     return C_OK;
 }
 
-C_STATUS resize_array_exchange(void* array, int first, int second)
+/*
+ * Swaps two items in the array at the index values specified.
+ */
+C_STATUS resize_array_exchange(void *array, int first, int second)
 {
-    rs_array* ra = array;
+    rs_array *ra = array;
     if (first < 0 || first >= ra->head.size ||
         second < 0 || second >= ra->head.size)
     {
         return CE_BOUNDS;
     }
 
-    void* tmp = ra->buff[first];
+    void *tmp = ra->buff[first];
     ra->buff[first] = ra->buff[second];
     ra->buff[second] = tmp;
     return C_OK;
@@ -106,10 +128,10 @@ C_STATUS resize_array_exchange(void* array, int first, int second)
  * Removes an item from the array and shuffles everything after that
  * point back one space. Reallcoates the array if it's one quarter full.
  */
-C_STATUS resize_array_remove(void* array, int index, void** item)
+C_STATUS resize_array_remove(void *array, int index, void **item)
 {
-    rs_array* ra = array;
-    void* rv;
+    rs_array *ra = array;
+    void *rv;
     int err = resize_array_get(array, index, &rv);
     if (err)
     {
@@ -135,13 +157,16 @@ C_STATUS resize_array_remove(void* array, int index, void** item)
     return C_OK;
 }
 
-void* resize_array_copy(void* array)
+/*
+ * Shallow copies a resizable array
+ */
+void *resize_array_copy(void *array)
 {
-    rs_array* ra = array;
-    rs_array* rv = (rs_array*)malloc(sizeof(rs_array));
+    rs_array *ra = array;
+    rs_array *rv = (rs_array*)malloc(sizeof(rs_array));
     memcpy(rv, ra, sizeof(rs_array));
 
-    void** buffer = malloc(rv->capacity * sizeof(void*));
+    void **buffer = malloc(rv->capacity * sizeof(void*));
     rv->buff = buffer;
     memcpy(rv->buff, ra->buff, rv->head.size * sizeof(void*));
     return rv;
@@ -150,9 +175,9 @@ void* resize_array_copy(void* array)
 /*
  * Free the array and its buffer. Optionally free all items within.
  */
-void resize_array_free(void* array, int items)
+void resize_array_free(void *array, int items)
 {
-    rs_array* ra = array;
+    rs_array *ra = array;
     if (items)
     {
         for (int i = 0; i < ra->head.size; i++)

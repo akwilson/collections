@@ -1,3 +1,7 @@
+/*
+ * Implementation functions for the hash table. Stores values accessed by key.
+ */
+
 #include <stdlib.h>
 #include <string.h>
 #include "collections.h"
@@ -53,9 +57,12 @@ static void *alloc_iter_state(void *table)
     return rv;
 }
 
-static int get_next_node(void* iter_state, node** next)
+/*
+ * Gets the next node from the iterator
+ */
+static int get_next_node(void *iter_state, node **next)
 {
-    iter_ptr* iptr = iter_state;
+    iter_ptr *iptr = iter_state;
 
     if (iptr->next)
     {
@@ -80,11 +87,14 @@ static int get_next_node(void* iter_state, node** next)
     return 0;
 }
 
-static int get_next_iter(void* table, void* iter_state, void** next)
+/*
+ * Gets the next key/value pair from the iterator
+ */
+static int get_next_iter(void *table, void *iter_state, void **next)
 {
     UNUSED(table);
 
-    node* nn;
+    node *nn;
     if (get_next_node(iter_state, &nn))
     {
         *next = &nn->key_value;
@@ -134,14 +144,17 @@ static unsigned long hash(const char *str)
 
     while ((c = *str++))
     {
-        // hash * 33 + c
+        // hash  *33 + c
         hash = ((hash << 5) + hash) + c;
     }
 
     return hash;
 }
 
-static node** get_slot_head(hash_tab* ht, const char* key, unsigned long *hash_val)
+/*
+ * Gets the first item in the linked list at the array slot for the given key
+ */
+static node **get_slot_head(hash_tab *ht, const char *key, unsigned long *hash_val)
 {
     *hash_val = hash(key);
     int slot = *hash_val % ht->capacity;
@@ -149,9 +162,12 @@ static node** get_slot_head(hash_tab* ht, const char* key, unsigned long *hash_v
     return &ht->array[slot];
 }
 
-static node* new_node(char* key, void* value, unsigned long hash_val)
+/*
+ * Creates a new node to be stored in the hash table
+ */
+static node *new_node(char *key, void *value, unsigned long hash_val)
 {
-    node* rv = (node*)malloc(sizeof(node));
+    node *rv = (node*)malloc(sizeof(node));
     rv->hash = hash_val;
     rv->key_value.key = key;
     rv->key_value.value = value;
@@ -159,7 +175,11 @@ static node* new_node(char* key, void* value, unsigned long hash_val)
     return rv;
 }
 
-static node** find(node** head, unsigned long hash_val)
+/*
+ * Searches the linked list pointed to by head for the given hash value. Returns the node
+ * with that hash.
+ */
+static node **find(node **head, unsigned long hash_val)
 {
     while (*head)
     {
@@ -174,6 +194,9 @@ static node** find(node** head, unsigned long hash_val)
     return 0;
 }
 
+/*
+ * Creates a new hash table. Uses the default size if no value is provided by the user.
+ */
 void *hash_table(int init_size)
 {
     int sz = init_size <= DEF_SIZE ? DEF_SIZE : init_size;
@@ -193,13 +216,16 @@ void *hash_table(int init_size)
     return ht;
 }
 
+/*
+ * Adds a new key/value pair to the hash table
+ */
 void hash_table_add(void *table, char *key, void *value)
 {
     hash_tab *ht = table;
 
     if (ht->num_array > ht->capacity / 2)
     {
-        resize(ht, ht->capacity * 2);
+        resize(ht, ht->capacity  *2);
     }
 
     unsigned long hash_val;
@@ -227,15 +253,18 @@ void hash_table_add(void *table, char *key, void *value)
     ht->head.size++;
 }
 
-C_STATUS hash_table_get(void* table, char* key, void** value)
+/*
+ * Returns the value associated with the given key
+ */
+C_STATUS hash_table_get(void *table, char *key, void **value)
 {
-    hash_tab* ht = table;
+    hash_tab *ht = table;
 
     unsigned long hash_val;
-    node** head = get_slot_head(ht, key, &hash_val);
+    node **head = get_slot_head(ht, key, &hash_val);
     if (*head)
     {
-        node** ptr = find(head, hash_val);
+        node **ptr = find(head, hash_val);
         if (ptr)
         {
             *value = (*ptr)->key_value.value;
@@ -247,9 +276,12 @@ C_STATUS hash_table_get(void* table, char* key, void** value)
     return CE_MISSING;
 }
 
-C_STATUS hash_table_remove(void* table, char* key)
+/*
+ * Disassociates a value from a key
+ */
+C_STATUS hash_table_remove(void *table, char *key)
 {
-    hash_tab* ht = table;
+    hash_tab *ht = table;
 
     if (ht->num_array > ht->base_cap && ht->num_array <= ht->capacity / 4)
     {
@@ -257,13 +289,13 @@ C_STATUS hash_table_remove(void* table, char* key)
     }
 
     unsigned long hash_val;
-    node** head = get_slot_head(ht, key, &hash_val);
+    node **head = get_slot_head(ht, key, &hash_val);
     if (*head)
     {
-        node** ptr = find(head, hash_val);
+        node **ptr = find(head, hash_val);
         if (ptr)
         {
-            node* rm = (*ptr);
+            node *rm = (*ptr);
             if (head == ptr && rm->next == 0)
             {
                 ht->num_array--;
@@ -303,11 +335,11 @@ void *hash_table_copy(void *table)
  * Frees a hash table. If items is non-zero this method will also attempt to free any memory
  * pointed to by the keys and values.
  */
-void hash_table_free(void* table, int items)
+void hash_table_free(void *table, int items)
 {
-    hash_tab* ht = table;
-    iter_ptr* iter = alloc_iter_state(table);
-    node* next;
+    hash_tab *ht = table;
+    iter_ptr *iter = alloc_iter_state(table);
+    node *next;
     while (get_next_node(iter, &next))
     {
         if (items)
