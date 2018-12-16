@@ -1,17 +1,27 @@
+/*
+ * Unit tests for the priority queue
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "../src/collections.h"
 #include "minunit.h"
 
-static int compare(void* first, void* second)
+/*
+ * Compares two strings. Used by the priority queue to add new items to the correct position.
+ */
+static int compare(void *first, void *second)
 {
     return strcmp((const char*)first, (const char*)second);
 }
 
-char* pq_add_items()
+/*
+ * Test the addition of new items to the queue
+ */
+char *pq_add_items()
 {
-    void* pq = priority_queue_min(0, compare);
+    void *pq = priority_queue_min(0, compare);
     C_STATUS status = priority_queue_add(pq, "CCC");
     MU_ASSERT("Bad return status after item add", status == C_OK);
 
@@ -40,16 +50,19 @@ char* pq_add_items()
     return 0;
 }
 
-char* pq_peek_items()
+/*
+ * Peek items at the top of the queue
+ */
+char *pq_peek_items()
 {
-    void* pq = priority_queue_min(0, compare);
+    void *pq = priority_queue_min(0, compare);
     priority_queue_add(pq, "CCC");
     priority_queue_add(pq, "BBB");
     priority_queue_add(pq, "DDD");
     priority_queue_add(pq, "GGG");
     priority_queue_add(pq, "AAA");
 
-    char* res;
+    char *res;
     C_STATUS status = priority_queue_peek(pq, (void*)&res);
     MU_ASSERT("Wrong status at peek head", status == C_OK);
     MU_ASSERT("Wrong item at peek head", strcmp(res, "AAA") == 0);
@@ -65,16 +78,19 @@ char* pq_peek_items()
     return 0;
 }
 
-char* pq_pop_items()
+/*
+ * Pop the min item from the queue
+ */
+char *pq_pop_items()
 {
-    void* pq = priority_queue_min(0, compare);
+    void *pq = priority_queue_min(0, compare);
     priority_queue_add(pq, "CCC");
     priority_queue_add(pq, "BBB");
     priority_queue_add(pq, "DDD");
     priority_queue_add(pq, "GGG");
     priority_queue_add(pq, "AAA");
 
-    char* res;
+    char *res;
     C_STATUS status = priority_queue_pop(pq, (void*)&res);
     MU_ASSERT("Wrong status at pop head", status == C_OK);
     MU_ASSERT("Wrong item at pop head", strcmp(res, "AAA") == 0);
@@ -112,16 +128,19 @@ char* pq_pop_items()
     return 0;
 }
 
-char* pq_pop_items_max()
+/*
+ * Pop the max item from the queue
+ */
+char *pq_pop_items_max()
 {
-    void* pq = priority_queue_max(0, compare);
+    void *pq = priority_queue_max(0, compare);
     priority_queue_add(pq, "CCC");
     priority_queue_add(pq, "BBB");
     priority_queue_add(pq, "DDD");
     priority_queue_add(pq, "GGG");
     priority_queue_add(pq, "AAA");
 
-    char* res;
+    char *res;
     C_STATUS status = priority_queue_pop(pq, (void*)&res);
     MU_ASSERT("Wrong status at pop head max", status == C_OK);
     MU_ASSERT("Wrong item at pop head max", strcmp(res, "GGG") == 0);
@@ -159,19 +178,22 @@ char* pq_pop_items_max()
     return 0;
 }
 
-char* pq_iterate_items()
+/*
+ * Iterate over the queue. Items should be returned in order.
+ */
+char *pq_iterate_items()
 {
-    void* pq = priority_queue_min(0, compare);
+    void *pq = priority_queue_min(0, compare);
     priority_queue_add(pq, "CCC");
     priority_queue_add(pq, "BBB");
     priority_queue_add(pq, "DDD");
     priority_queue_add(pq, "GGG");
     priority_queue_add(pq, "AAA");
 
-    void* iter = clxns_iter_new(pq);
+    void *iter = clxns_iter_new(pq);
     int avail = clxns_iter_move_next(iter);
     MU_ASSERT("Wrong iter move next rv", avail == 1);
-    char* item = clxns_iter_get_next(iter);
+    char *item = clxns_iter_get_next(iter);
     MU_ASSERT("Wrong iter value", strcmp(item, "AAA") == 0);
 
     avail = clxns_iter_move_next(iter);
@@ -202,16 +224,19 @@ char* pq_iterate_items()
     return 0;
 }
 
-char* pq_copy_queue()
+/*
+ * Copy a priority queue
+ */
+char *pq_copy_queue()
 {
-    void* pq = priority_queue_min(0, compare);
+    void *pq = priority_queue_min(0, compare);
     priority_queue_add(pq, "CCC");
     priority_queue_add(pq, "BBB");
     priority_queue_add(pq, "DDD");
     priority_queue_add(pq, "GGG");
     priority_queue_add(pq, "AAA");
 
-    void* pq2 = priority_queue_copy(pq);
+    void *pq2 = priority_queue_copy(pq);
 
     int cnt = clxns_count(pq2);
     MU_ASSERT("Wrong item return count on new q", cnt == 5);
@@ -222,7 +247,7 @@ char* pq_copy_queue()
     cnt = clxns_count(pq2);
     MU_ASSERT("Wrong item return count on new q after add", cnt == 6);
 
-    char* res;
+    char *res;
     C_STATUS status = priority_queue_peek(pq, (void*)&res);
     MU_ASSERT("Wrong status at peek head on orig", status == C_OK);
     MU_ASSERT("Wrong item at peek head on orig", strcmp(res, "AAA") == 0);

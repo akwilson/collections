@@ -1,13 +1,20 @@
+/*
+ * Unit test for the hash table
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include "minunit.h"
 #include "../src/collections.h"
 
-static void* populate(int init, int num)
+/*
+ * Populate a hash table with some test data
+ */
+static void *populate(int init, int num)
 {
     char *k, *v;
-    void* ht = hash_table(init);
+    void *ht = hash_table(init);
     for (int i = 0; i < num; i++)
     {
         k = (char*)malloc(9);
@@ -20,9 +27,12 @@ static void* populate(int init, int num)
     return ht;
 }
 
-char* ht_add_items()
+/*
+ * Test that items can be added to the hash table
+ */
+char *ht_add_items()
 {
-    void* ht = hash_table(0);
+    void *ht = hash_table(0);
     hash_table_add(ht, "AAA", "aaa");
     hash_table_add(ht, "BBB", "bbb");
     hash_table_add(ht, "XXX", "xxx");
@@ -36,9 +46,12 @@ char* ht_add_items()
     return 0;
 }
 
-char* ht_replace()
+/*
+ * Replace the value of an existing key
+ */
+char *ht_replace()
 {
-    void* ht = hash_table(0);
+    void *ht = hash_table(0);
     hash_table_add(ht, "AAA", "aaa");
     hash_table_add(ht, "BBB", "bbb");
     hash_table_add(ht, "AAA", "xxx");
@@ -46,7 +59,7 @@ char* ht_replace()
     int cnt = clxns_count(ht);
     MU_ASSERT("Wrong number of items after add", cnt == 2);
 
-    char* value;
+    char *value;
     C_STATUS st = hash_table_get(ht, "AAA", (void*)&value);
     MU_ASSERT("Wrong status after first get", st == C_OK);
     MU_ASSERT("Wrong value after first get", !strcmp("xxx", value));
@@ -59,15 +72,18 @@ char* ht_replace()
     return 0;
 }
 
-char* ht_get_items()
+/*
+ * Lookup items in the hash table
+ */
+char *ht_get_items()
 {
     int num = 30;
-    void* ht = populate(0, num);
+    void *ht = populate(0, num);
 
     int cnt = clxns_count(ht);
     MU_ASSERT("Wrong number of items after populate get", cnt == num);
 
-    char* value;
+    char *value;
     C_STATUS st = hash_table_get(ht, "string0", (void*)&value);
     MU_ASSERT("Wrong status after first get", st == C_OK);
     MU_ASSERT("Wrong value after first get", !strcmp("STRING0", value));
@@ -94,17 +110,20 @@ char* ht_get_items()
     return 0;
 }
 
-char* ht_iterate_sparse()
+/*
+ * Iterate over a sparsely populated hash table
+ */
+char *ht_iterate_sparse()
 {
-    void* ht = hash_table(0);
+    void *ht = hash_table(0);
     hash_table_add(ht, "AAA", "aaa");
     hash_table_add(ht, "BBB", "bbb");
 
     int i = 0;
-    void* iter = clxns_iter_new(ht);
+    void *iter = clxns_iter_new(ht);
     while (clxns_iter_move_next(iter))
     {
-        kvp* val = clxns_iter_get_next(iter);
+        kvp *val = clxns_iter_get_next(iter);
         if (!i)
         {
             MU_ASSERT("Incorrect key after first iterate", !strcmp(val->key, "AAA"));
@@ -128,7 +147,7 @@ char* ht_iterate_sparse()
  * Test the hash table iterator.
  *
  * Key/value pairs take the form "STRING${INDEX_VALUE}". The order of items returned is uncertain, so
- * this test checks that each key and value is the same index * value and that the sum of the index
+ * this test checks that each key and value is the same index  *value and that the sum of the index
  * values is as expected.
  */
 char *ht_iterate()
@@ -141,7 +160,7 @@ char *ht_iterate()
     while (clxns_iter_move_next(iter))
     {
         kvp *val = clxns_iter_get_next(iter);
-        char* idx = val->key + 6;
+        char *idx = val->key + 6;
         int key_idx = atoi(idx);
 
         idx = val->value + 6;
@@ -152,7 +171,7 @@ char *ht_iterate()
         i++;
     }
 
-    int expected_idx_tot = num_entries * (num_entries - 1) / 2;
+    int expected_idx_tot = num_entries  *(num_entries - 1) / 2;
     MU_ASSERT("Index totals incorrect. Missing or dupe values in table?", idx_tot == expected_idx_tot);
     MU_ASSERT("Incorrect iter count", i == num_entries);
     clxns_iter_free(iter);
@@ -160,6 +179,9 @@ char *ht_iterate()
     return 0;
 }
 
+/*
+ * Iterate over a hash table with sequentially empty slots
+ */
 char *ht_iterate_sparse_ish()
 {
     // Create a new hash table and add a small number of items
@@ -185,10 +207,13 @@ char *ht_iterate_sparse_ish()
     return 0;
 }
 
-char* ht_iterate_empty()
+/*
+ * Iterate over an empty hash table. i.e. don't return anything and don't crash...
+ */
+char *ht_iterate_empty()
 {
-    void* ht = hash_table(0);
-    void* iter = clxns_iter_new(ht);
+    void *ht = hash_table(0);
+    void *iter = clxns_iter_new(ht);
     int i = 0;
     while (clxns_iter_move_next(iter))
     {
@@ -200,10 +225,13 @@ char* ht_iterate_empty()
     return 0;
 }
 
-char* ht_remove_items()
+/*
+ * Remove items from a hash table
+ */
+char *ht_remove_items()
 {
     int num = 30;
-    void* ht = populate(0, num);
+    void *ht = populate(0, num);
 
     C_STATUS st = hash_table_remove(ht, "string31");
     MU_ASSERT("Wrong status after first remove", st == CE_MISSING);
