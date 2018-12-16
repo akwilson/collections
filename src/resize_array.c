@@ -61,7 +61,7 @@ static int get_next_iter(void *array, void *iter_state, void **next)
  */
 void *resize_array(int init_size)
 {
-    int sz = init_size == 0 ? DEF_SIZE : init_size;
+    int sz = init_size <= DEF_SIZE ? DEF_SIZE : init_size;
     rs_array *rv = (rs_array*)malloc(sizeof(rs_array));
     void **buffer = malloc(sz * sizeof(void*));
     rv->buff = buffer;
