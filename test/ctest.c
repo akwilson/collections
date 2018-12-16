@@ -1,3 +1,7 @@
+/*
+ * Entry point for collections unit tests
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,7 +10,7 @@
 
 int tests_run = 0;
 
-static char* all_tests()
+static char *all_tests()
 {
     MU_RUN_TEST(ra_add);
     MU_RUN_TEST(ra_add_adjust);
@@ -38,7 +42,7 @@ static char* all_tests()
 
 int main()
 {
-    char* result = all_tests();
+    char *result = all_tests();
     if (result != 0)
     {
         printf("%s\n", result);

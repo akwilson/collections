@@ -1,3 +1,7 @@
+/*
+ * Macros for basic unit testing
+ */
+
 #ifndef MIN_UNIT_H
 #define MIN_UNIT_H
 
