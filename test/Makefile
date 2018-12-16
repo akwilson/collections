@@ -6,7 +6,7 @@ BUILDDIR = ../build
 BIN_OUT = $(addprefix $(BUILDDIR)/, $(BIN))
 OBJS = $(SRCS:%.c=$(addprefix $(BUILDDIR)/, %.o))
 DEPS = $(OBJS:%.o=%.d)
-CFLAGS = -g -I. -I /usr/local/include
+CFLAGS = -g -I. -I /usr/local/include -Wall -Wextra
 #LDFLAGS = -linker_flags
 LIB_PATH = ../build
 LIBS = -lclxns

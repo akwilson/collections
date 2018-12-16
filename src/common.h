@@ -1,6 +1,8 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#define UNUSED(...) (void)(__VA_ARGS__)
+
 // header object common to all collections
 typedef struct header
 {

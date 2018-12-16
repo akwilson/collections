@@ -82,6 +82,8 @@ static int get_next_node(void* iter_state, node** next)
 
 static int get_next_iter(void* table, void* iter_state, void** next)
 {
+    UNUSED(table);
+
     node* nn;
     if (get_next_node(iter_state, &nn))
     {
@@ -125,12 +127,12 @@ static void resize(hash_tab *ht, int new_size)
 /*
  * Hashes a string. Courtesy of http://www.cse.yorku.ca/~oz/hash.html
  */
-static unsigned long hash(unsigned char *str)
+static unsigned long hash(const char *str)
 {
     unsigned long hash = 5381;
     int c;
 
-    while (c = *str++)
+    while ((c = *str++))
     {
         // hash * 33 + c
         hash = ((hash << 5) + hash) + c;
@@ -139,7 +141,7 @@ static unsigned long hash(unsigned char *str)
     return hash;
 }
 
-static node** get_slot_head(hash_tab* ht, unsigned char* key, unsigned long *hash_val)
+static node** get_slot_head(hash_tab* ht, const char* key, unsigned long *hash_val)
 {
     *hash_val = hash(key);
     int slot = *hash_val % ht->capacity;

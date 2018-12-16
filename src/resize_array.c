@@ -29,6 +29,8 @@ static void resize(rs_array* ra, int new_size)
  */
 static void* alloc_iter_state(void* array)
 {
+    UNUSED(array);
+
     int* st = (int*)malloc(sizeof(int));
     *st = 0;
     return st;
@@ -36,7 +38,6 @@ static void* alloc_iter_state(void* array)
 
 static int get_next_iter(void* array, void* iter_state, void** next)
 {
-    rs_array* ra = array;
     int* cur = (int*)iter_state;
     C_STATUS st = resize_array_get(array, *cur, next);
     (*cur)++;

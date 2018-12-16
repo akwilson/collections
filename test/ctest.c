@@ -36,7 +36,7 @@ static char* all_tests()
     return 0;
 }
 
-int main(int argc, char* argv[])
+int main()
 {
     char* result = all_tests();
     if (result != 0)

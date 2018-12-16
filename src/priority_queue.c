@@ -13,6 +13,8 @@ typedef struct p_queue
 
 static int get_next_iter(void* collection, void* iter_state, void** next)
 {
+    UNUSED(collection);
+
     p_queue* pq = iter_state;
     C_STATUS status = priority_queue_pop(pq, next);
     return status == C_OK;

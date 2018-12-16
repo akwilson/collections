@@ -135,7 +135,6 @@ char *ht_iterate()
 {
     int num_entries = 30;
     void *ht = populate(0, num_entries);
-    char buf[9];
 
     int i = 0, idx_tot = 0;
     void *iter = clxns_iter_new(ht);
@@ -175,7 +174,7 @@ char *ht_iterate_sparse_ish()
     void *iter = clxns_iter_new(ht);
     while (clxns_iter_move_next(iter))
     {
-        kvp *val = clxns_iter_get_next(iter);
+        clxns_iter_get_next(iter);
         i++;
     }
 
