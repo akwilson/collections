@@ -30,7 +30,7 @@ typedef struct _iter_ptrs
 typedef struct _hash_tab
 {
     header head;
-    node **array;  // hash table slots
+    node **array;     // hash table slots
     size_t capacity;  // number of items in the hash_table
     size_t base_cap;  // the initial / minimum size
     size_t num_array; // number of slots filled in the array
@@ -39,9 +39,9 @@ typedef struct _hash_tab
 /*
  * Creates a new hash table iterator and points it to the first item in the table.
  */
-static void *alloc_iter_state(void *table)
+static void *alloc_iter_state(const void *table)
 {
-    hash_tab *ht = table;
+    const hash_tab *ht = table;
     iter_ptr *rv = (iter_ptr*)malloc(sizeof(iter_ptr));
     for (size_t i = 0; i < ht->capacity; i++)
     {
@@ -90,7 +90,7 @@ static int get_next_node(void *iter_state, node **next)
 /*
  * Gets the next key/value pair from the iterator
  */
-static int get_next_iter(void *table, void *iter_state, void **next)
+static int get_next_iter(const void *table, void *iter_state, void **next)
 {
     UNUSED(table);
 
@@ -154,7 +154,7 @@ static unsigned long hash(const char *str)
 /*
  * Gets the first item in the linked list at the array slot for the given key
  */
-static node **get_slot_head(hash_tab *ht, const char *key, unsigned long *hash_val)
+static node **get_slot_head(const hash_tab *ht, const char *key, unsigned long *hash_val)
 {
     *hash_val = hash(key);
     int slot = *hash_val % ht->capacity;
@@ -256,9 +256,9 @@ void hash_table_add(void *table, char *key, void *value)
 /*
  * Returns the value associated with the given key
  */
-C_STATUS hash_table_get(void *table, char *key, void **value)
+C_STATUS hash_table_get(const void *table, const char *key, void **value)
 {
-    hash_tab *ht = table;
+    const hash_tab *ht = table;
 
     unsigned long hash_val;
     node **head = get_slot_head(ht, key, &hash_val);
@@ -279,7 +279,7 @@ C_STATUS hash_table_get(void *table, char *key, void **value)
 /*
  * Disassociates a value from a key
  */
-C_STATUS hash_table_remove(void *table, char *key)
+C_STATUS hash_table_remove(void *table, const char *key)
 {
     hash_tab *ht = table;
 
@@ -315,9 +315,9 @@ C_STATUS hash_table_remove(void *table, char *key)
  * Copies a hash table. Performs a shallow copy by creating a new table and adding
  * all of the values from the original in to it.
  */
-void *hash_table_copy(void *table)
+void *hash_table_copy(const void *table)
 {
-    hash_tab *orig = table;
+    const hash_tab *orig = table;
     hash_tab *rv = hash_table(orig->capacity);
 
     void *iter = alloc_iter_state(orig);

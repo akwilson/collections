@@ -13,14 +13,14 @@ typedef struct p_queue
 {
     header head;
     void *array;
-    int (*compare)(void *first, void *second);
+    int (*compare)(const void *first, const void *second);
     int order;
 } p_queue;
 
 /*
  * Gets the next item from the iterator.
  */
-static int get_next_iter(void *collection, void *iter_state, void **next)
+static int get_next_iter(const void *collection, void *iter_state, void **next)
 {
     UNUSED(collection);
 
@@ -41,7 +41,7 @@ static void free_iter(void *iter_state)
  * Uses the comparison function to compare two items in the
  * queue at the index positions specified
  */
-static int checkVals(p_queue *pq, size_t first, size_t second)
+static int checkVals(const p_queue *pq, size_t first, size_t second)
 {
     void *fVal;
     void *sVal;
@@ -96,7 +96,7 @@ static void swim(p_queue *pq, size_t key)
  * Creates a new priority queue. Values are sorted based on the compare function. The order
  * parameter indicates direction.
  */
-static void *new_pq(size_t init_size, int order, int (*compare)(void *first, void *second))
+static void *new_pq(size_t init_size, int order, int (*compare)(const void *first, const void *second))
 {
     p_queue *rv = (p_queue*)malloc(sizeof(p_queue));
     rv->array = resize_array(init_size);
@@ -115,7 +115,7 @@ static void *new_pq(size_t init_size, int order, int (*compare)(void *first, voi
 /*
  * Creates a new priority queue. Values are sorted based on the compare function. Smallest items first.
  */
-void *priority_queue_min(size_t init_size, int (*compare)(void *first, void *second))
+void *priority_queue_min(size_t init_size, int (*compare)(const void *first, const void *second))
 {
     return new_pq(init_size, 0, compare);
 }
@@ -123,7 +123,7 @@ void *priority_queue_min(size_t init_size, int (*compare)(void *first, void *sec
 /*
  * Creates a new priority queue. Values are sorted based on the compare function. Largest items first.
  */
-void *priority_queue_max(size_t init_size, int (*compare)(void *first, void *second))
+void *priority_queue_max(size_t init_size, int (*compare)(const void *first, const void *second))
 {
     return new_pq(init_size, 1, compare);
 }
@@ -168,18 +168,18 @@ C_STATUS priority_queue_pop(void *pqueue, void **item)
 /*
  * Returns but does not remove the next item off the queue
  */
-C_STATUS priority_queue_peek(void *pqueue, void **item)
+C_STATUS priority_queue_peek(const void *pqueue, void **item)
 {
-    p_queue *pq = pqueue;
+    const p_queue *pq = pqueue;
     return resize_array_get(pq->array, 1, item);
 }
 
 /*
  * Shallow copies a priority queue
  */
-void *priority_queue_copy(void *pqueue)
+void *priority_queue_copy(const void *pqueue)
 {
-    p_queue *pq = pqueue;
+    const p_queue *pq = pqueue;
     p_queue *rv = (p_queue*)malloc(sizeof(p_queue));
     memcpy(rv, pq, sizeof(p_queue));
     rv->array = resize_array_copy(pq->array);

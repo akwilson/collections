@@ -16,7 +16,7 @@
 typedef struct rs_array
 {
     header head;
-    void **buff;  // the data in the array
+    void **buff;     // the data in the array
     size_t capacity; // the number of items allocated to the array
     size_t base_cap; // the intial / minimum size
 } rs_array;
@@ -35,7 +35,7 @@ static void resize(rs_array *ra, size_t new_size)
  * Creates a new iterator and points it to the first item in the array.
  * Allocates an integer to keep track of the position in the array
  */
-static void *alloc_iter_state(void *array)
+static void *alloc_iter_state(const void *array)
 {
     UNUSED(array);
 
@@ -47,7 +47,7 @@ static void *alloc_iter_state(void *array)
 /*
  * Gets the next item from the iterator
  */
-static int get_next_iter(void *array, void *iter_state, void **next)
+static int get_next_iter(const void *array, void *iter_state, void **next)
 {
     int *cur = (int*)iter_state;
     C_STATUS st = resize_array_get(array, *cur, next);
@@ -94,9 +94,9 @@ void resize_array_add(void *array, void *item)
  * Gets at item from the resizable array at the index specified. The item
  * parameter will point to the data item.
  */
-C_STATUS resize_array_get(void *array, size_t index, void **item)
+C_STATUS resize_array_get(const void *array, size_t index, void **item)
 {
-    rs_array *ra = array;
+    const rs_array *ra = array;
     if (index >= ra->head.size)
     {
         return CE_BOUNDS;
@@ -159,9 +159,9 @@ C_STATUS resize_array_remove(void *array, size_t index, void **item)
 /*
  * Shallow copies a resizable array
  */
-void *resize_array_copy(void *array)
+void *resize_array_copy(const void *array)
 {
-    rs_array *ra = array;
+    const rs_array *ra = array;
     rs_array *rv = (rs_array*)malloc(sizeof(rs_array));
     memcpy(rv, ra, sizeof(rs_array));
 

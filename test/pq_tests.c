@@ -11,7 +11,7 @@
 /*
  * Compares two strings. Used by the priority queue to add new items to the correct position.
  */
-static int compare(void *first, void *second)
+static int compare(const void *first, const void *second)
 {
     return strcmp((const char*)first, (const char*)second);
 }

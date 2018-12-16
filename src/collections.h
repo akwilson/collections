@@ -20,10 +20,10 @@ typedef enum
 // == COMMON ==================================================================
 
 // Return the number of items in the array
-size_t clxns_count(void *collection);
+size_t clxns_count(const void *collection);
 
 // Create a new iterator
-void *clxns_iter_new(void *collection);
+void *clxns_iter_new(const void *collection);
 
 // Check if the iterator has more items to consume
 int clxns_iter_move_next(void *iterator);
@@ -43,7 +43,7 @@ void *resize_array(size_t init_size);
 void resize_array_add(void *array, void *item);
 
 // Access an item at the given position in the array
-C_STATUS resize_array_get(void *array, size_t index, void **item);
+C_STATUS resize_array_get(const void *array, size_t index, void **item);
 
 // Swap two items in the array
 C_STATUS resize_array_exchange(void *array, size_t first, size_t second);
@@ -52,7 +52,7 @@ C_STATUS resize_array_exchange(void *array, size_t first, size_t second);
 C_STATUS resize_array_remove(void *array, size_t index, void **item);
 
 // Shallow copy a resize array
-void *resize_array_copy(void *array);
+void *resize_array_copy(const void *array);
 
 // Free the array and its contents if items is non-zero
 void resize_array_free(void *array, int items);
@@ -64,20 +64,20 @@ void resize_array_free(void *array, int items);
  * size and a callback to compare items
  * _min orders ascending, _max orders descending
  */
-void *priority_queue_min(size_t init_size, int (*compare)(void *first, void *second));
-void *priority_queue_max(size_t init_size, int (*compare)(void *first, void *second));
+void *priority_queue_min(size_t init_size, int (*compare)(const void *first, const void *second));
+void *priority_queue_max(size_t init_size, int (*compare)(const void *first, const void *second));
 
 // Add an item to the priority queue. May return CE_NULL_ITEM.
 C_STATUS priority_queue_add(void *pqueue, void *item);
 
 // Look at but do not remove the head of the queue
-C_STATUS priority_queue_peek(void *pqueue, void **item);
+C_STATUS priority_queue_peek(const void *pqueue, void **item);
 
 // Remove the head of the priority queue
 C_STATUS priority_queue_pop(void *pqueue, void **item);
 
 // Shallow copy a priority queue
-void *priority_queue_copy(void *pqueue);
+void *priority_queue_copy(const void *pqueue);
 
 // Free the priority queue and its contents if items is non-zero
 void priority_queue_free(void *array, int items);
@@ -91,13 +91,13 @@ void *hash_table(size_t init_size);
 void hash_table_add(void *table, char *key, void *value);
 
 // Return the value associated with the key
-C_STATUS hash_table_get(void *table, char *key, void **value);
+C_STATUS hash_table_get(const void *table, const char *key, void **value);
 
 // Remove the key/value pair
-C_STATUS hash_table_remove(void *table, char *key);
+C_STATUS hash_table_remove(void *table, const char *key);
 
 // Shallow copy the hash table
-void *hash_table_copy(void *table);
+void *hash_table_copy(const void *table);
 
 // Free the hash table and its contents if items is non-zero
 void hash_table_free(void *table, int items);

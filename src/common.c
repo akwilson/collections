@@ -8,24 +8,24 @@
 
 // A collection iterator
 typedef struct {
-    void *next_item;  // next item to return in call to _get_next()
-    void *state;      // collection specific iterator state
-    void *collection; // collection pointed to by this iterator
+    void *next_item;        // next item to return in call to _get_next()
+    void *state;            // collection specific iterator state
+    const void *collection; // collection pointed to by this iterator
 } iterator_t;
 
 /*
  * Returns the number of items in the collection
  */
-size_t clxns_count(void *collection)
+size_t clxns_count(const void *collection)
 {
-    header *head = collection;
+    const header *head = collection;
     return head->size;
 }
 
 /*
  * Creates a new iterator pointing to the first item in the collection
  */
-void *clxns_iter_new(void *collection)
+void *clxns_iter_new(const void *collection)
 {
     iterator_t *iter = (iterator_t*)malloc(sizeof(iterator_t));
     iter->collection = collection;
