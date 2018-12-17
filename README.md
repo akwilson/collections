@@ -38,9 +38,18 @@ while (clxns_iter_move_next(iter))
 clxns_iter_free(iter);
 ```
 
-## Building and Running Unit Tests
-in the top level directory
+## Building, Running Unit Tests and Installing
+In the top level directory
 ```
-$ make
-$ ./scripts/runTests.sh
+$ make               # build the library and unit tests
+$ make tests         # run the unit tests
+$ sudo make install  # install to /usr/include
+```
+On Linux you will then need to run `ldconfig` to pick up the installed library
+```
+$ sudo ldconfig
+```
+You can confirm that the library was installed correctly
+```
+$ ldconfig -p | grep libclxns
 ```
