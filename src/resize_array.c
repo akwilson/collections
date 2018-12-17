@@ -56,6 +56,16 @@ static int get_next_iter(const void *array, void *iter_state, void **next)
 }
 
 /*
+ * Swap two elements in the array. No bounds checking performed here.
+ */
+static void swap_elements(rs_array *ra, size_t first, size_t second)
+{
+    void *tmp = ra->buff[first];
+    ra->buff[first] = ra->buff[second];
+    ra->buff[second] = tmp;
+}
+
+/*
  * Creates a new resizable array. Uses the default size if none is
  * specified by the user.
  */
@@ -91,6 +101,46 @@ void resize_array_add(void *array, void *item)
 }
 
 /*
+ * Inserts an item in to the array at the position specified
+ */
+C_STATUS resize_array_insert(void *array, size_t index, void *item)
+{
+    rs_array *ra = array;
+    if (index > ra->head.size)
+    {
+        return CE_BOUNDS;
+    }
+    else if (index == ra->head.size)
+    {
+        resize_array_add(ra, item);
+        return C_OK;
+    }
+
+    if (ra->head.size == ra->capacity)
+    {
+        resize(ra, ra->capacity * 2);
+    }
+
+    // Shuffle items up to make space at index
+    for (size_t i = ra->head.size; i > index; i--) {
+        swap_elements(ra, i - 1, i);
+    }
+
+    ra->buff[index] = item;
+    ra->head.size++;
+    return C_OK;
+}
+
+/*
+ * Replaces an item in the array
+ */
+void resize_array_replace(void *array, size_t index, void *item)
+{
+    rs_array *ra = array;
+    ra->buff[index] = item;
+}
+
+/*
  * Gets at item from the resizable array at the index specified. The item
  * parameter will point to the data item.
  */
@@ -117,9 +167,7 @@ C_STATUS resize_array_exchange(void *array, size_t first, size_t second)
         return CE_BOUNDS;
     }
 
-    void *tmp = ra->buff[first];
-    ra->buff[first] = ra->buff[second];
-    ra->buff[second] = tmp;
+    swap_elements(ra, first, second);
     return C_OK;
 }
 

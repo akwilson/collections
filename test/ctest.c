@@ -19,6 +19,8 @@ static char *all_tests()
     MU_RUN_TEST(ra_check_errors);
     MU_RUN_TEST(ra_exchange);
     MU_RUN_TEST(ra_copy_array);
+    MU_RUN_TEST(ra_insert);
+    MU_RUN_TEST(ra_replace);
 
     MU_RUN_TEST(pq_add_items);
     MU_RUN_TEST(pq_peek_items);

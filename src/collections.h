@@ -42,6 +42,12 @@ void *resize_array(size_t init_size);
 // Add an item to the array
 void resize_array_add(void *array, void *item);
 
+// Insert an item in to the middle of an array
+C_STATUS resize_array_insert(void *array, size_t index, void *item);
+
+// Replace an item in the array with a different item
+void resize_array_replace(void *array, size_t index, void *item);
+
 // Access an item at the given position in the array
 C_STATUS resize_array_get(const void *array, size_t index, void **item);
 

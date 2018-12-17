@@ -10,6 +10,8 @@ char *ra_remove_adjust(void);
 char *ra_check_errors(void);
 char *ra_exchange(void);
 char *ra_copy_array(void);
+char *ra_insert(void);
+char *ra_replace(void);
 
 // == PRIORITY QUEUE ==========================================================
 

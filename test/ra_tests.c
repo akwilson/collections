@@ -227,3 +227,82 @@ char *ra_copy_array()
     resize_array_free(array, 0);
     return 0;
 }
+
+/*
+ * Insert items in to the beginning, middle and end of an array
+ */
+char *ra_insert()
+{
+    void *array = resize_array(0);
+    resize_array_add(array, "string1");
+    resize_array_add(array, "string2");
+    resize_array_add(array, "string3");
+    resize_array_add(array, "string5");
+    resize_array_add(array, "string6");
+    resize_array_add(array, "string7");
+    resize_array_add(array, "string8");
+
+    // insert beginning, middle, end
+    resize_array_insert(array, 0, "string0");
+    resize_array_insert(array, 4, "string4");
+    resize_array_insert(array, 9, "string9");
+
+    // tests
+    int s = clxns_count(array);
+    MU_ASSERT("Wrong number of items in array after insert", s == 10);
+
+    char buf[16];
+    int i = 0;
+    void *iter = clxns_iter_new(array);
+    while (clxns_iter_move_next(iter))
+    {
+        char *res = clxns_iter_get_next(iter);
+        sprintf(buf, "string%d", i++);
+        MU_ASSERT("Incorrect data in iter after insert", !strcmp(res, buf));
+    }
+
+    MU_ASSERT("Incorrect iter count after insert", i == 10);
+
+    clxns_iter_free(iter);
+    resize_array_free(array, 0);
+    return 0;
+}
+
+/*
+ * Replace items in an array
+ */
+char *ra_replace()
+{
+    void *array = resize_array(0);
+    resize_array_add(array, "stringx");
+    resize_array_add(array, "string1");
+    resize_array_add(array, "string2");
+    resize_array_add(array, "stringx");
+    resize_array_add(array, "string4");
+    resize_array_add(array, "stringx");
+
+    // insert beginning, middle, end
+    resize_array_replace(array, 0, "string0");
+    resize_array_replace(array, 3, "string3");
+    resize_array_replace(array, 5, "string5");
+
+    // tests
+    int s = clxns_count(array);
+    MU_ASSERT("Wrong number of items in array after replace", s == 6);
+
+    char buf[8];
+    int i = 0;
+    void *iter = clxns_iter_new(array);
+    while (clxns_iter_move_next(iter))
+    {
+        char *res = clxns_iter_get_next(iter);
+        sprintf(buf, "string%d", i++);
+        MU_ASSERT("Incorrect data in iter after replace", !strcmp(res, buf));
+    }
+
+    MU_ASSERT("Incorrect iter count after replace", i == 6);
+
+    clxns_iter_free(iter);
+    resize_array_free(array, 0);
+    return 0;
+}
