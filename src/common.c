@@ -72,3 +72,21 @@ void clxns_iter_free(void *iterator)
 
     free(iter);
 }
+
+/*
+ * Shallow copies a collection to another of the same type
+ */
+void *clxns_copy(const void *collection)
+{
+    const header *hdr = collection;
+    return hdr->copy_collection(collection);
+}
+
+/*
+ * Free memory held directly by the collection, optionally clear collection contents too
+ */
+void clxns_free(void *collection, int items)
+{
+    const header *hdr = collection;
+    hdr->free_collection(collection, items);
+}

@@ -42,7 +42,7 @@ char *ht_add_items()
     int cnt = clxns_count(ht);
     MU_ASSERT("Wrong number of items after add", cnt == 5);
 
-    hash_table_free(ht, 0);
+    clxns_free(ht, 0);
     return 0;
 }
 
@@ -68,7 +68,7 @@ char *ht_replace()
     MU_ASSERT("Wrong status after first get", st == C_OK);
     MU_ASSERT("Wrong value after first get", !strcmp("bbb", value));
 
-    hash_table_free(ht, 0);
+    clxns_free(ht, 0);
     return 0;
 }
 
@@ -106,7 +106,7 @@ char *ht_get_items()
         MU_ASSERT("Wrong value after loop get", !strcmp(v, value));
     }
 
-    hash_table_free(ht, 0);
+    clxns_free(ht, 0);
     return 0;
 }
 
@@ -139,7 +139,7 @@ char *ht_iterate_sparse()
 
     MU_ASSERT("Incorrect sparse iter count", i == 1);
     clxns_iter_free(iter);
-    hash_table_free(ht, 0);
+    clxns_free(ht, 0);
     return 0;
 }
 
@@ -175,7 +175,7 @@ char *ht_iterate()
     MU_ASSERT("Index totals incorrect. Missing or dupe values in table?", idx_tot == expected_idx_tot);
     MU_ASSERT("Incorrect iter count", i == num_entries);
     clxns_iter_free(iter);
-    hash_table_free(ht, 1);
+    clxns_free(ht, 1);
     return 0;
 }
 
@@ -202,7 +202,7 @@ char *ht_iterate_sparse_ish()
 
     MU_ASSERT("Incorrect iter count for sparse-ish table", i == 5);
     clxns_iter_free(iter);
-    hash_table_free(ht, 0);
+    clxns_free(ht, 0);
 
     return 0;
 }
@@ -252,7 +252,7 @@ char *ht_remove_items()
         MU_ASSERT("Wrong number of items after remove", cnt == num - i - 1);
     }
 
-    hash_table_free(ht, 1);
+    clxns_free(ht, 1);
     return 0;
 }
 
@@ -270,7 +270,7 @@ char *ht_copy()
     hash_table_add(ht, "QQQ", "qqq");
 
     // Copy it
-    void *ht2 = hash_table_copy(ht);
+    void *ht2 = clxns_copy(ht);
 
     int cnt = clxns_count(ht2);
     MU_ASSERT("Wrong number of items after copy", cnt == 5);
@@ -293,7 +293,7 @@ char *ht_copy()
     MU_ASSERT("Wrong status after copy new get", st == C_OK);
     MU_ASSERT("Wrong value after copy new get", !strcmp("zzz", value));
 
-    hash_table_free(ht, 0);
-    hash_table_free(ht2, 0);
+    clxns_free(ht, 0);
+    clxns_free(ht2, 0);
     return 0;
 }

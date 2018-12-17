@@ -7,14 +7,18 @@
 // Header object common to all collections
 typedef struct header
 {
-    // number of items in the collection
+    // Number of items in the collection
     size_t size;
-    // allocates state for the iterator
-    void* (*alloc_iter_state)(const void* collection);
-    // gets the next iterator item in the collection
-    int (*get_next_iter)(const void* collection, void* state, void** data);
-    // function to free the allocated iterator state
-    void (*free_iter)(void* state);
+    // Allocates state for the iterator
+    void *(*alloc_iter_state)(const void *collection);
+    // Gets the next iterator item in the collection
+    int (*get_next_iter)(const void *collection, void *state, void **data);
+    // Frees the allocated iterator state
+    void (*free_iter)(void *state);
+    // Copies the collection
+    void *(*copy_collection)(const void *collection);
+    // Frees the collection
+    void (*free_collection)(void *collection, int items);
 } header;
 
 #endif

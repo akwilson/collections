@@ -195,6 +195,51 @@ static node **find(node **head, unsigned long hash_val)
 }
 
 /*
+ * Copies a hash table. Performs a shallow copy by creating a new table and adding
+ * all of the values from the original in to it.
+ */
+static void *copy_hash_table(const void *table)
+{
+    const hash_tab *orig = table;
+    hash_tab *rv = hash_table(orig->capacity);
+
+    void *iter = alloc_iter_state(orig);
+    node *nn;
+    while (get_next_node(iter, &nn))
+    {
+        hash_table_add(rv, nn->key_value.key, nn->key_value.value);
+    }
+
+    free(iter);
+    return rv;
+}
+
+/*
+ * Frees a hash table. If items is non-zero this method will also attempt to free any memory
+ * pointed to by the keys and values.
+ */
+static void free_hash_table(void *table, int items)
+{
+    hash_tab *ht = table;
+    iter_ptr *iter = alloc_iter_state(table);
+    node *next;
+    while (get_next_node(iter, &next))
+    {
+        if (items)
+        {
+            free(next->key_value.key);
+            free(next->key_value.value);
+        }
+
+        free(next);
+    }
+
+    free(ht->array);
+    free(ht);
+    free(iter);
+}
+
+/*
  * Creates a new hash table. Uses the default size if no value is provided by the user.
  */
 void *hash_table(size_t init_size)
@@ -212,6 +257,8 @@ void *hash_table(size_t init_size)
     ht->head.alloc_iter_state = alloc_iter_state;
     ht->head.get_next_iter = get_next_iter;
     ht->head.free_iter = 0;
+    ht->head.copy_collection = copy_hash_table;
+    ht->head.free_collection = free_hash_table;
 
     return ht;
 }
@@ -309,49 +356,4 @@ C_STATUS hash_table_remove(void *table, const char *key)
     }
 
     return CE_MISSING;
-}
-
-/*
- * Copies a hash table. Performs a shallow copy by creating a new table and adding
- * all of the values from the original in to it.
- */
-void *hash_table_copy(const void *table)
-{
-    const hash_tab *orig = table;
-    hash_tab *rv = hash_table(orig->capacity);
-
-    void *iter = alloc_iter_state(orig);
-    node *nn;
-    while (get_next_node(iter, &nn))
-    {
-        hash_table_add(rv, nn->key_value.key, nn->key_value.value);
-    }
-
-    free(iter);
-    return rv;
-}
-
-/*
- * Frees a hash table. If items is non-zero this method will also attempt to free any memory
- * pointed to by the keys and values.
- */
-void hash_table_free(void *table, int items)
-{
-    hash_tab *ht = table;
-    iter_ptr *iter = alloc_iter_state(table);
-    node *next;
-    while (get_next_node(iter, &next))
-    {
-        if (items)
-        {
-            free(next->key_value.key);
-            free(next->key_value.value);
-        }
-
-        free(next);
-    }
-
-    free(ht->array);
-    free(ht);
-    free(iter);
 }

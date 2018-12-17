@@ -66,6 +66,39 @@ static void swap_elements(rs_array *ra, size_t first, size_t second)
 }
 
 /*
+ * Shallow copies a resizable array
+ */
+static void *copy_resize_array(const void *array)
+{
+    const rs_array *ra = array;
+    rs_array *rv = (rs_array*)malloc(sizeof(rs_array));
+    memcpy(rv, ra, sizeof(rs_array));
+
+    void **buffer = malloc(rv->capacity * sizeof(void*));
+    rv->buff = buffer;
+    memcpy(rv->buff, ra->buff, rv->head.size * sizeof(void*));
+    return rv;
+}
+
+/*
+ * Free the array and its buffer. Optionally free all items within.
+ */
+static void free_resize_array(void *array, int items)
+{
+    rs_array *ra = array;
+    if (items)
+    {
+        for (size_t i = 0; i < ra->head.size; i++)
+        {
+            free(ra->buff[i]);
+        }
+    }
+
+    free(ra->buff);
+    free(ra);
+}
+
+/*
  * Creates a new resizable array. Uses the default size if none is
  * specified by the user.
  */
@@ -77,10 +110,14 @@ void *resize_array(size_t init_size)
     rv->buff = buffer;
     rv->capacity = sz;
     rv->base_cap = sz;
+
     rv->head.size = 0;
     rv->head.alloc_iter_state = alloc_iter_state;
     rv->head.get_next_iter = get_next_iter;
     rv->head.free_iter = 0;
+    rv->head.copy_collection = copy_resize_array;
+    rv->head.free_collection = free_resize_array;
+
     return rv;
 }
 
@@ -202,37 +239,4 @@ C_STATUS resize_array_remove(void *array, size_t index, void **item)
     }
 
     return C_OK;
-}
-
-/*
- * Shallow copies a resizable array
- */
-void *resize_array_copy(const void *array)
-{
-    const rs_array *ra = array;
-    rs_array *rv = (rs_array*)malloc(sizeof(rs_array));
-    memcpy(rv, ra, sizeof(rs_array));
-
-    void **buffer = malloc(rv->capacity * sizeof(void*));
-    rv->buff = buffer;
-    memcpy(rv->buff, ra->buff, rv->head.size * sizeof(void*));
-    return rv;
-}
-
-/*
- * Free the array and its buffer. Optionally free all items within.
- */
-void resize_array_free(void *array, int items)
-{
-    rs_array *ra = array;
-    if (items)
-    {
-        for (size_t i = 0; i < ra->head.size; i++)
-        {
-            free(ra->buff[i]);
-        }
-    }
-
-    free(ra->buff);
-    free(ra);
 }

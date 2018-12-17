@@ -34,7 +34,7 @@ static int get_next_iter(const void *collection, void *iter_state, void **next)
  */
 static void free_iter(void *iter_state)
 {
-    priority_queue_free(iter_state, 0);
+    clxns_free(iter_state, 0);
 }
 
 /*
@@ -93,6 +93,28 @@ static void swim(p_queue *pq, size_t key)
 }
 
 /*
+ * Shallow copies a priority queue
+ */
+static void *copy_priority_queue(const void *pqueue)
+{
+    const p_queue *pq = pqueue;
+    p_queue *rv = (p_queue*)malloc(sizeof(p_queue));
+    memcpy(rv, pq, sizeof(p_queue));
+    rv->array = clxns_copy(pq->array);
+    return rv;
+}
+
+/*
+ * Frees all of the memory pointed to by the priority queue. Optionally frees data too.
+ */
+static void free_priority_queue(void *pqueue, int items)
+{
+    p_queue *pq = pqueue;
+    clxns_free(pq->array, items);
+    free(pq);
+}
+
+/*
  * Creates a new priority queue. Values are sorted based on the compare function. The order
  * parameter indicates direction.
  */
@@ -102,10 +124,13 @@ static void *new_pq(size_t init_size, int order, int (*compare)(const void *firs
     rv->array = resize_array(init_size);
     rv->compare = compare;
     rv->order = order;
+
     rv->head.size = 0;
-    rv->head.alloc_iter_state = priority_queue_copy;
+    rv->head.alloc_iter_state = copy_priority_queue;
     rv->head.get_next_iter = get_next_iter;
     rv->head.free_iter = free_iter;
+    rv->head.copy_collection = copy_priority_queue;
+    rv->head.free_collection = free_priority_queue;
 
     // 1 based array for the heap
     resize_array_add(rv->array, NULL);
@@ -172,26 +197,4 @@ C_STATUS priority_queue_peek(const void *pqueue, void **item)
 {
     const p_queue *pq = pqueue;
     return resize_array_get(pq->array, 1, item);
-}
-
-/*
- * Shallow copies a priority queue
- */
-void *priority_queue_copy(const void *pqueue)
-{
-    const p_queue *pq = pqueue;
-    p_queue *rv = (p_queue*)malloc(sizeof(p_queue));
-    memcpy(rv, pq, sizeof(p_queue));
-    rv->array = resize_array_copy(pq->array);
-    return rv;
-}
-
-/*
- * Frees all of the memory pointed to by the priority queue. Optionally frees data too.
- */
-void priority_queue_free(void *pqueue, int items)
-{
-    p_queue *pq = pqueue;
-    resize_array_free(pq->array, items);
-    free(pq);
 }

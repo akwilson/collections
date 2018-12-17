@@ -34,6 +34,12 @@ void *clxns_iter_get_next(void *iterator);
 // Free the iterator
 void clxns_iter_free(void *iterator);
 
+// Shallow copy the collection to another of the same type
+void *clxns_copy(const void *collection);
+
+// Free memory held directly by the collection, optionally clear collection contents too
+void clxns_free(void *collection, int items);
+
 // == RESIZE ARRAY =============================================================
 
 // Create and return a new array. Specify the initial size.
@@ -57,12 +63,6 @@ C_STATUS resize_array_exchange(void *array, size_t first, size_t second);
 // Remove an item from the array, set item to the value if non-zero is passed in
 C_STATUS resize_array_remove(void *array, size_t index, void **item);
 
-// Shallow copy a resize array
-void *resize_array_copy(const void *array);
-
-// Free the array and its contents if items is non-zero
-void resize_array_free(void *array, int items);
-
 // == PRIORITY QUEUE ===========================================================
 
 /*
@@ -82,12 +82,6 @@ C_STATUS priority_queue_peek(const void *pqueue, void **item);
 // Remove the head of the priority queue
 C_STATUS priority_queue_pop(void *pqueue, void **item);
 
-// Shallow copy a priority queue
-void *priority_queue_copy(const void *pqueue);
-
-// Free the priority queue and its contents if items is non-zero
-void priority_queue_free(void *array, int items);
-
 // == HASH TABLE ==============================================================
 
 // Create and return a new hash table. Specify the initial size.
@@ -101,11 +95,5 @@ C_STATUS hash_table_get(const void *table, const char *key, void **value);
 
 // Remove the key/value pair
 C_STATUS hash_table_remove(void *table, const char *key);
-
-// Shallow copy the hash table
-void *hash_table_copy(const void *table);
-
-// Free the hash table and its contents if items is non-zero
-void hash_table_free(void *table, int items);
 
 #endif
