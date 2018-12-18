@@ -14,13 +14,17 @@ BIN1_OUT = $(addprefix $(BUILDDIR)/, $(BIN1))
 BIN1_OBJS = $(BIN1_SRCS:%.c=$(addprefix $(BUILDDIR)/, %.o))
 BIN1_DEPS = $(BIN1_OBJS:%.o=%.d)
 
+TST1_OUT = $(addprefix $(BUILDDIR)/, $(TST1))
+TST1_OBJS = $(TST1_SRCS:%.c=$(addprefix $(BUILDDIR)/, %.o))
+TST1_DEPS = $(TST1_OBJS:%.o=%.d)
+
 CFLAGS = -g -I. -I /usr/local/include -Wall -Wextra
 #LDFLAGS = -linker_flags
 
 $(BUILDDIR)/%.o : %.c
 	$(COMPILE.c) -MMD -fpic -o $@ $<
 
-all : $(LIB1_OUT) $(BIN1_OUT)
+all : $(LIB1_OUT) $(BIN1_OUT) $(TST1_OUT)
 
 $(LIB1_OUT) : $(LIB1_OBJS)
 	$(LINK.c) $^ -shared -o $@
@@ -28,7 +32,10 @@ $(LIB1_OUT) : $(LIB1_OBJS)
 $(BIN1_OUT) : $(BIN1_OBJS)
 	$(LINK.c) $^ -L$(LIB_PATH) $(LIBS) -o $@
 
--include $(LIB1_DEPS) $(BIN1_DEPS)
+$(TST1_OUT) : $(TST1_OBJS)
+	$(LINK.c) $^ -L$(LIB_PATH) $(LIBS) -o $@
+
+-include $(LIB1_DEPS) $(BIN1_DEPS) $(TST1_DEPS)
 
 ifeq ($(PREFIX),)
 	PREFIX = /usr/local
@@ -36,10 +43,12 @@ endif
 
 .PHONY: clean test install
 clean :
-	rm -f $(LIB1_OBJS) $(LIB1_DEPS) $(LIB1_OUT) $(BIN1_OBJS) $(BIN1_DEPS) $(BIN1_OUT)
+	rm -f $(LIB1_OBJS) $(LIB1_DEPS) $(LIB1_OUT) \
+		  $(BIN1_OBJS) $(BIN1_DEPS) $(BIN1_OUT) \
+		  $(TST1_OBJS) $(TST1_DEPS) $(TST1_OUT)
 
 tests :
-	@LD_LIBRARY_PATH=$(LIB_PATH) DYLD_LIBRARY_PATH=$(LIB_PATH) $(BIN1_OUT)
+	@LD_LIBRARY_PATH=$(LIB_PATH) DYLD_LIBRARY_PATH=$(LIB_PATH) $(TST1_OUT)
 
 INSTALL_H = $(HEADERS:%.h=$(addprefix $(DESTDIR)$(PREFIX)/include/, %.h))
 INSTALL_L = $(addprefix $(DESTDIR)$(PREFIX)/lib/, $(LIB1))
