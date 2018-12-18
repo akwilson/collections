@@ -1,10 +1,15 @@
 # Makefile to build a shared object and/or a binary executable and/or unit test executable
 # Include this file in your own Makefile
 # Places object, dependency files and output files in $(BUILDDIR)
+# $(BUILDDIR) created if it does not exist
 # Compiles using full warnings and rebuilds when header files are changed
 # `make clean` will remove all output from $(BUILDDIR)
 # `make tests` will run the unit test binary
 # `make install` will install the files in /usr/local
+
+ifeq ($(BUILDDIR),)
+	BUILDDIR = build
+endif
 
 LIB1_OUT = $(addprefix $(BUILDDIR)/, $(LIB1))
 LIB1_OBJS = $(LIB1_SRCS:%.c=$(addprefix $(BUILDDIR)/, %.o))
@@ -24,7 +29,7 @@ CFLAGS = -g -I. -I /usr/local/include -Wall -Wextra
 $(BUILDDIR)/%.o : %.c
 	$(COMPILE.c) -MMD -fpic -o $@ $<
 
-all : $(LIB1_OUT) $(BIN1_OUT) $(TST1_OUT)
+all : directories $(LIB1_OUT) $(BIN1_OUT) $(TST1_OUT)
 
 $(LIB1_OUT) : $(LIB1_OBJS)
 	$(LINK.c) $^ -shared -o $@
@@ -41,7 +46,10 @@ ifeq ($(PREFIX),)
 	PREFIX = /usr/local
 endif
 
-.PHONY: clean test install
+.PHONY: directories clean test install
+directories :
+	@mkdir -p $(BUILDDIR)
+
 clean :
 	rm -f $(LIB1_OBJS) $(LIB1_DEPS) $(LIB1_OUT) \
 		  $(BIN1_OBJS) $(BIN1_DEPS) $(BIN1_OUT) \
