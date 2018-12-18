@@ -1,6 +1,6 @@
 # Collections Library in C
 
-A slowly expanding collection of collection implementations in C. So far we have,
+A slowly expanding collection of collection implementations in C for Linux and MacOS. So far we have,
 
 ## Resizing Array
 * Add items to the array and it will expend / contract as required
@@ -20,14 +20,16 @@ A slowly expanding collection of collection implementations in C. So far we have
 ## Common Functions
 * Return the number of items in the collection
 * Iterate over the collection
+* Shallow copy a collection to another of the same type
+* Free a collection, and optionally the data it refers to
 
 For example,
 
 ```c
-// Get the number of items in some collection
+/* Get the number of items in some collection */
 int c = clxns_count(array);
 
-// Iterate...
+/* Iterate... */
 void *iter = clxns_iter_new(array);
 while (clxns_iter_move_next(iter))
 {
@@ -36,6 +38,12 @@ while (clxns_iter_move_next(iter))
 }
 
 clxns_iter_free(iter);
+
+/* Copy a collection */
+void *duplicate = clxns_copy(array);
+
+/* Free a collection and all memory it refers to */
+clxns_free(array, 1);
 ```
 
 ## Building, Running Unit Tests and Installing
@@ -52,4 +60,5 @@ $ sudo ldconfig
 You can confirm that the library was installed correctly
 ```
 $ ldconfig -p | grep libclxns
+        libclxns.so (libc6,x86-64) => /usr/local/lib/libclxns.so
 ```
