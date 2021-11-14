@@ -1,6 +1,8 @@
 #ifndef COLLECTIONS_H
 #define COLLECTIONS_H
 
+#include <stdlib.h>
+
 // Key/value pair, returned by the hash table iterator
 typedef struct _kvp
 {
