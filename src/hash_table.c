@@ -326,7 +326,7 @@ C_STATUS hash_table_get(const void *table, const char *key, void **value)
 /*
  * Disassociates a value from a key
  */
-C_STATUS hash_table_remove(void *table, const char *key)
+C_STATUS hash_table_remove(void *table, const char *key, int items)
 {
     hash_tab *ht = table;
 
@@ -349,6 +349,12 @@ C_STATUS hash_table_remove(void *table, const char *key)
             }
 
             (*ptr) = rm->next;
+            if (items)
+            {
+                free(rm->key_value.key);
+                free(rm->key_value.value);
+            }
+
             free(rm);
             ht->head.size--;
             return C_OK;

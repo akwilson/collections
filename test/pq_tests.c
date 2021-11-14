@@ -70,6 +70,7 @@ char *pq_peek_items()
     int cnt = clxns_count(pq);
     MU_ASSERT("Wrong item return count", cnt == 5);
 
+    clxns_free(pq, 0);
     pq = priority_queue_min(0, compare);
     status = priority_queue_peek(pq, (void*)&res);
     MU_ASSERT("Wrong status at peek on empty queue", status == CE_BOUNDS);

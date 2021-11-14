@@ -96,6 +96,6 @@ void hash_table_add(void *table, char *key, void *value);
 C_STATUS hash_table_get(const void *table, const char *key, void **value);
 
 // Remove the key/value pair
-C_STATUS hash_table_remove(void *table, const char *key);
+C_STATUS hash_table_remove(void *table, const char *key, int items);
 
 #endif

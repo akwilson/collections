@@ -93,20 +93,18 @@ char *ht_get_items()
     MU_ASSERT("Wrong status after second get", st == CE_MISSING);
     MU_ASSERT("Wrong value after second get", value == 0);
 
-    char *k, *v;
+    char k[9], v[9];
     for (int i = 0; i < num; i++)
     {
-        k = (char*)malloc(9);
         sprintf(k, "string%d", i);
         st = hash_table_get(ht, k, (void*)&value);
         MU_ASSERT("Wrong status after loop get", st == C_OK);
 
-        v = (char*)malloc(9);
         sprintf(v, "STRING%d", i);
         MU_ASSERT("Wrong value after loop get", !strcmp(v, value));
     }
 
-    clxns_free(ht, 0);
+    clxns_free(ht, 1);
     return 0;
 }
 
@@ -222,6 +220,7 @@ char *ht_iterate_empty()
 
     MU_ASSERT("Incorrect empty iter count", i == 0);
     clxns_iter_free(iter);
+    clxns_free(ht, 0);
     return 0;
 }
 
@@ -233,16 +232,16 @@ char *ht_remove_items()
     int num = 30;
     void *ht = populate(0, num);
 
-    C_STATUS st = hash_table_remove(ht, "string31");
+    C_STATUS st = hash_table_remove(ht, "string31", 0);
     MU_ASSERT("Wrong status after first remove", st == CE_MISSING);
 
     int cnt;
-    char *k, *value;
+    char *value;
+    char k[9];
     for (int i = 0; i < num; i++)
     {
-        k = (char*)malloc(9);
         sprintf(k, "string%d", i);
-        st = hash_table_remove(ht, k);
+        st = hash_table_remove(ht, k, 1);
         MU_ASSERT("Wrong status after loop remove", st == C_OK);
 
         st = hash_table_get(ht, k, (void*)&value);
